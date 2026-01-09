@@ -1,6 +1,6 @@
 # group50
 
-This is a project made by five students from DTU through the Machine Learning Operation course 6.
+This is a project made by five students from DTU through the Machine Learning Operation course 02476.
 
 ## Project structure
 
