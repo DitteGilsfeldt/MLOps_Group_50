@@ -1,0 +1,6 @@
+# config/experiments/ex2.yaml
+defaults:
+  - training_conf
+
+hyperparameters:
+  epochs: 30
