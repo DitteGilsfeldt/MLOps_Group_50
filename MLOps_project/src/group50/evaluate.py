@@ -15,7 +15,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 def evaluate_model() -> int:
     p = argparse.ArgumentParser(prog="eval",
                                 description="Evaluate the model on the test dataset.",
-                                epilog="Example usage: python evaluate.py --model_checkpoint=model.pth")
+                                epilog="Example usage: python evaluate.py --model_checkpoint='model.pth'")
     p.add_argument("--model_checkpoint", required=True)
     args = p.parse_args()
     return evaluate_from_checkpoint(args.model_checkpoint)
