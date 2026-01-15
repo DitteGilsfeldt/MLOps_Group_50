@@ -181,14 +181,14 @@ s224081, s225787, s210666, s224215, s210659
 >
 > Answer:
 
---- question 3 fill here ---
+We used the TIMM library as a third-party package in our project, as it provides a wide range of pre-trained models and architectures for image classification tasks. Espeically, we used the ResNet18 model. It is described as the smallest and most lightweight model, hence, making it a popular choice. By using the pre-trained weights from TIMM, we were able to speed up our general development process.
+
 
 ## Coding environment
 
 > In the following section we are interested in learning more about you local development environment. This includes
 > how you managed dependencies, the structure of your code and how you managed code quality.
 
-> We used UV for managing our dependencies and used Cookiecutter to create the initial project structure. To uphold the PEP8 standard we used Ruff for linting formatting and MyPy for typing. 
 
 ### Question 4
 
@@ -203,7 +203,26 @@ s224081, s225787, s210666, s224215, s210659
 >
 > Answer:
 
---- question 4 fill here ---
+We used UV for managing environments, and all of our dependencies are in the and a pyproject.toml file linked to requirement.txt which manages our packages. Furthermore, we used Cookiecutter to create the initial project structure. To uphold the PEP8 standard we used Ruff for linting formatting and MyPy for typing.
+
+If a new team member were to join, all they have to do is, first, ensure they have UV installed on their computer, then from the main repository they have to do ```cd MLOps_project``` to get into the project folder, and then run one of the following commands according to their hardware setup:
+
+CPU:
+```bash
+uv sync --extra cpu --index pytorch-cpu
+```
+
+CUDA (NVIDIA GPUs):
+
+```bash
+uv sync --extra cuda --index pytorch-cuda
+```
+
+MPS (Apple Silicon GPUs):
+
+```bash
+uv sync --extra mps --index pytorch-mps
+```
 
 ### Question 5
 
@@ -219,7 +238,9 @@ s224081, s225787, s210666, s224215, s210659
 >
 > Answer:
 
---- question 5 fill here ---
+> From the cookiecutter template, we have filled out the `data.py`, `models.py`, `train.py`, and `api.py` files in the `src/project_name/` folder. We have also added configuration files in the `configs/` folder to manage our hyperparameters and experiment settings.
+
+> [TO DO: ADD MORE]
 
 ### Question 6
 
@@ -234,7 +255,9 @@ s224081, s225787, s210666, s224215, s210659
 >
 > Answer:
 
---- question 6 fill here ---
+For code quality and format, we went for PEP8 standards using Ruff for linting and formatting?
+
+[TO DO: CHECK THIS OR MAYBE CONSIDER MYPY AS WELL]
 
 ## Version control
 
@@ -285,7 +308,7 @@ Each group member made their own branch to work on different parts of the projec
 >
 > Answer:
 
---- question 9 fill here ---
+The first thing we did when joining a shared Git repository was to create a branch for each teammember resulting in 5 branches (excluding main). The general workflow was that each member worked on their own branch and when they wanted to merge code into the main branch, they created a pull request. The pull request was then reviewed by at least another member before being approved and merged into the main branch. This process helped both code quality, version control and preventing merge conflicts. 
 
 ### Question 10
 
@@ -336,7 +359,14 @@ Each group member made their own branch to work on different parts of the projec
 >
 > Answer:
 
---- question 12 fill here ---
+We used Hydra for configuration management. For instance, a config file for `training.py` file were created in the `configs/` folder inside `src/group50/`. Inside this file, we could choose the parameters for training such as learning rate, batch size, and number of epochs. To run an experiment with specific hyperparameters, we would save the changes in the config file and execute the training script using the command:
+
+
+```
+uv run train
+```
+
+Following training, the used configurations and the logs were automatically saved in the `outputs/` folder for future reference.
 
 ### Question 13
 
@@ -351,7 +381,7 @@ Each group member made their own branch to work on different parts of the projec
 >
 > Answer:
 
---- question 13 fill here ---
+As mentioned in the question above, we used Hydra for configuration management. Whenever an experiment is run, the configuration file used for that specific experiment is saved in the `outputs/` folder along with the logs and results. This ensures that all the hyperparameters and settings used during the experiment are recorded and can be referenced later.
 
 ### Question 14
 
