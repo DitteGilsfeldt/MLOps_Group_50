@@ -1,0 +1,14 @@
+[[index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[index]]
+name = "pytorch-cuda"
+url = "https://download.pytorch.org/whl/cu121"
+explicit = true
+
+[[index]]
+name = "pytorch-mps"
+url = "https://download.pytorch.org/whl"
+explicit = true

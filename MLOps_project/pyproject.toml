@@ -53,3 +53,8 @@ line-length = 120
 
 [tool.coverage.run]
 omit = ["tests/*"]
+
+[project.optional-dependencies]
+cpu = ["torch>=2.6.0"]
+cuda = ["torch>=2.6.0"]
+mps = ["torch>=2.6.0"]
