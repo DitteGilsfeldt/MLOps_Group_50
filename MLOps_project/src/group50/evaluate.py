@@ -6,6 +6,13 @@ from model import EmotionModel
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
 def evaluate_model(model_checkpoint: str) -> None:
+    """
+    Function to evaluate the model on the test dataset, by calculating accuracy.
+    
+    Args:
+        model_checkpoint: Path to the model checkpoint where weights are saved.
+    """
+    
     print('Evaluating model')
     print(model_checkpoint)
 
