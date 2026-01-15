@@ -30,16 +30,36 @@ class EmotionModel(nn.Module):
             in_chans=3
         )
 
-    def forward(self, x: torch.Tensor):
-        """
-        Performs a forward pass of the model.
-        Args:
-            x: Input tensor of shape (batch_size, 3, height, width).
-        Returns:
-            Logits tensor of shape (batch_size, num_classes).
-        """
-        return self.backbone(x)
+        # Simple CNN for 3x48x48 inputs
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 32, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),  # 24x24
 
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),  # 12x12
+
+            nn.Conv2d(64, 128, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),  # 6x6
+        )
+
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(128 * 6 * 6, 256),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(256, num_classes),
+        )
+    
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if x.ndim != 4:
+            raise ValueError("Expected input to a 4D tensor")
+        if x.shape[1] != 3 or x.shape[2] != 48 or x.shape[3] != 48:
+            raise ValueError("Expected each sample to have shape [3, 48, 48]")
+
+        return self.backbone(x)
 
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
