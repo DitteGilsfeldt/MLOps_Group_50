@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mlops-group-50"
+version = "0.0.1"
+description = "Short Description"
+authors = [{ name = "Group50", email = "your@email.com" }]
+license = { file = "LICENSE" }
+keywords = ["machine learning", "MLOps"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.ruff]
+line-length = 120
+
+[tool.coverage.run]
+omit = ["tests/*"]
