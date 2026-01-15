@@ -30,6 +30,7 @@ def train(config: DictConfig) -> None:
 
     wandb.init(
         project="MLOps_Group_50_Emotion_Recognition",
+        entity="zilverwood-dtu",
         config={"lr": lr, "batch_size": batch_size, "epochs": epochs},
     )
 
