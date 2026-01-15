@@ -4,7 +4,7 @@ docs/site/
 manual_test/
 
 # data files
-data/preprocessed/
+data/processed/
 
 # other local dev info
 .vscode/
