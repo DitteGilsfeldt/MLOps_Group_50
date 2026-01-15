@@ -1,16 +1,53 @@
-from torch import nn
 import torch
+import torch.nn as nn
+import timm
 
-class Model(nn.Module):
-    """Just a dummy model to show how to structure your code"""
-    def __init__(self):
+class EmotionModel(nn.Module):
+    """
+    A PyTorch module for emotion classification using a pretrained backbone.
+    This model leverages the TIMM library to instantiate a ResNet architecture
+    adapted for a specific number of emotion classes.
+
+    Attributes:
+        backbone: The neural network architecture used for feature extraction.
+    """
+
+    def __init__(self, model_name='resnet18', num_classes=7, pretrained=True):
+        """
+        Initializes the EmotionModel.
+        Args:
+            model_name: The name of the model architecture from the timm library.
+            num_classes: The number of output classes (emotions).
+            pretrained: Whether to load ImageNet pretrained weights.
+        """
         super().__init__()
-        self.layer = nn.Linear(1, 1)
+        # Load the pretrained backbone
+        # in_chans=1 are grayscale but 3 is safer for standard ResNet
+        self.backbone = timm.create_model(
+            model_name,
+            pretrained=pretrained,
+            num_classes=num_classes,
+            in_chans=3
+        )
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.layer(x)
+    def forward(self, x: torch.Tensor):
+        """
+        Performs a forward pass of the model.
+        Args:
+            x: Input tensor of shape (batch_size, 3, height, width).
+        Returns:
+            Logits tensor of shape (batch_size, num_classes).
+        """
+        return self.backbone(x)
+
 
 if __name__ == "__main__":
-    model = Model()
-    x = torch.rand(1)
-    print(f"Output shape of model: {model(x).shape}")
+    device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+    # The dataset has 7 categories
+    model = EmotionModel(num_classes=7).to(device)
+    print(f"Model architecture: \n{model}")
+    # Test dummy image (Batch, Channels, H, W)
+    dummy_input = torch.randn(1, 3, 48, 48).to(device)
+    output = model(dummy_input)
+    print(f"Output device: {output.device}") # This can be GPU, CPU or mps
+    print(f"Output shape: {output.shape}") # Size should be [1, 7]
