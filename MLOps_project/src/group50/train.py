@@ -5,6 +5,7 @@ import hydra
 import torch
 import wandb
 from omegaconf import DictConfig
+import shutil
 
 from group50.data import emotion_data
 from group50.model import EmotionModel
@@ -77,6 +78,11 @@ def train(config: DictConfig) -> None:
 
     log.info("Big summer body done, strong and lean now!")
     torch.save(model.state_dict(), DATA_ROOT / "emotion_model.pth")
+    
+    # Clean up local wandb directory (logs are synced to WandB servers)
+    shutil.rmtree(PROJECT_ROOT / "wandb", ignore_errors=True)
+    shutil.rmtree("wandb", ignore_errors=True)
+    
     return None
 
 
