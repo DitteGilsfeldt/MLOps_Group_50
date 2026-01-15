@@ -218,6 +218,20 @@ dependencies = [
     { name = "typer" },
 ]
 
+[package.optional-dependencies]
+cpu = [
+    { name = "torch", version = "2.6.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
+    { name = "torch", version = "2.6.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin'" },
+]
+cuda = [
+    { name = "torch", version = "2.6.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
+    { name = "torch", version = "2.6.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin'" },
+]
+mps = [
+    { name = "torch", version = "2.6.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
+    { name = "torch", version = "2.6.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin'" },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "coverage" },
@@ -237,9 +251,13 @@ requires-dist = [
     { name = "pillow" },
     { name = "pytest" },
     { name = "torch", index = "https://download.pytorch.org/whl/cpu" },
+    { name = "torch", marker = "extra == 'cpu'", specifier = ">=2.6.0", index = "https://download.pytorch.org/whl/cpu" },
+    { name = "torch", marker = "extra == 'cuda'", specifier = ">=2.6.0", index = "https://download.pytorch.org/whl/cpu" },
+    { name = "torch", marker = "extra == 'mps'", specifier = ">=2.6.0", index = "https://download.pytorch.org/whl/cpu" },
     { name = "torchvision", index = "https://download.pytorch.org/whl/cpu" },
     { name = "typer" },
 ]
+provides-extras = ["cpu", "cuda", "mps"]
 
 [package.metadata.requires-dev]
 dev = [
