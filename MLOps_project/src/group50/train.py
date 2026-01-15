@@ -34,7 +34,9 @@ def train(lr: float = 1e-3, batch_size: int = 32, epochs: int = 2) -> None:
             loss.backward()
             optimizer.step()
 
-            accuracy = (y_pred.argmax(dim=1) == target).float().mean().item()
+            total = target.size(0)
+            correct = (y_pred.argmax(dim=1) == target).float().sum().item()
+            accuracy = correct / total
 
             preds.append(y_pred.detach().cpu())
             targets.append(target.detach().cpu())
