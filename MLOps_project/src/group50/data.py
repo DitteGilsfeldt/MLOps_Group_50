@@ -1,9 +1,7 @@
-import torch
-import os
-import typer
-import torchvision.transforms as transforms
-
 from pathlib import Path
+
+import torch
+import torchvision.transforms as transforms
 from PIL import Image
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -14,23 +12,19 @@ classes = ["angry", "disgusted", "fearful", "happy", "neutral", "sad", "surprise
 # map folder names to class indices
 classes_to_idx = {cls: i for i, cls in enumerate(classes)}
 
-# We do not use this, since we use ResNet which expects mean = [0.485, 0.456, 0.406] and std  = [0.229, 0.224, 0.225] normalization instead.
-# def normalize(images: torch.Tensor) -> torch.Tensor:
-#     """Normalize images."""
-#     return (images - images.mean()) / images.std()
-
-
 def load_data(split_dir: Path) -> tuple[torch.Tensor, torch.Tensor]:
     """Load images and targets from the specified directory and returns them as tensors."""
     images, targets = [], []
     # 1 channel like MNIST from the course, fixed size (48x48) like described and [0,1] format.
-    transform = transforms.Compose([
-        transforms.Resize((48, 48)),
-        transforms.Grayscale(num_output_channels=3),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], 
-                             std=[0.229, 0.224, 0.225])])
-    
+    transform = transforms.Compose(
+        [
+            transforms.Resize((48, 48)),
+            transforms.Grayscale(num_output_channels=3),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ]
+    )
+
     for class_name in classes:
         class_dir = split_dir / class_name
         label = classes_to_idx[class_name]
@@ -47,11 +41,12 @@ def load_data(split_dir: Path) -> tuple[torch.Tensor, torch.Tensor]:
 
     if not images:
         raise RuntimeError(f"No images found in {split_dir}")
-        
-    images_tensor = torch.stack(images) # TO DO: create PyTest to see if [N, 3, 48, 48] is satisfied
+
+    images_tensor = torch.stack(images)  # TO DO: create PyTest to see if [N, 3, 48, 48] is satisfied
     targets_tensor = torch.tensor(targets, dtype=torch.long)
-    
+
     return images_tensor, targets_tensor
+
 
 def preprocess_data() -> None:
     """Process raw data and save it to processed directory."""

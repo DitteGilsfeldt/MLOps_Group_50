@@ -1,7 +1,7 @@
 import os
-import torch
-import pytest
 
+import pytest
+import torch
 from group50.data import emotion_data
 
 DATA_PATH = "data/processed"
@@ -13,10 +13,8 @@ REQUIRED_FILES = [
     "data/processed/test_target.pt",
 ]
 
-@pytest.mark.skipif(
-    not all(os.path.exists(p) for p in REQUIRED_FILES),
-    reason="Processed data files not found"
-)
+
+@pytest.mark.skipif(not all(os.path.exists(p) for p in REQUIRED_FILES), reason="Processed data files not found")
 
 # @pytest.mark.skipif(
 #     not os.path.exists(DATA_PATH),
