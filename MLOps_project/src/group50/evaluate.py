@@ -1,7 +1,7 @@
 import torch
 import timm
-from data import emotion_data
-from model import EmotionModel
+from group50.data import emotion_data
+from group50.model import EmotionModel
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 

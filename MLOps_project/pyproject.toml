@@ -58,3 +58,8 @@ omit = ["tests/*"]
 cpu = ["torch>=2.6.0"]
 cuda = ["torch>=2.6.0"]
 mps = ["torch>=2.6.0"]
+
+[project.scripts]
+train = "group50.train:train"
+data = "group50.data:preprocess_data"
+eval = "group50.evaluate:evaluate_model"
