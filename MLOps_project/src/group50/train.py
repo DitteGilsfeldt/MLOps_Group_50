@@ -16,7 +16,6 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 log = logging.getLogger(__name__)
 
 
-@hydra.main(version_base=None, config_path="config", config_name="training_conf")
 def train(config: DictConfig) -> None:
     """Train a model on emtion_data."""
 
