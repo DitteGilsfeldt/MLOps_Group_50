@@ -1,7 +1,11 @@
 import torch
 import typer
+import hydra
+import logging
 from pathlib import Path
 from datetime import datetime
+from omegaconf import DictConfig
+
 
 from group50.data import emotion_data
 from group50.model import EmotionModel
@@ -11,12 +15,19 @@ DATA_ROOT = PROJECT_ROOT / "models"
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
+log = logging.getLogger(__name__)
 
-def train(lr: float = 1e-3, batch_size: int = 32, epochs: int = 1) -> None:
+@hydra.main(version_base=None, config_path="config", config_name="training_conf")
+
+def train(config: DictConfig) -> None:
     """Train a model on emtion_data."""
 
-    print("Time to get that summer body! We are training now...")
-    print(f"{lr=}, {batch_size=}, {epochs=}")
+    lr = config.hyperparameters.lr
+    batch_size = config.hyperparameters.batch_size
+    epochs = config.hyperparameters.epochs
+
+    log.info("Time to get that summer body! We are training now!")
+    log.info(f"{lr=}, {batch_size=}, {epochs=}")
  
     model = EmotionModel().to(DEVICE)
     train_set, _ = emotion_data()
@@ -47,13 +58,14 @@ def train(lr: float = 1e-3, batch_size: int = 32, epochs: int = 1) -> None:
             preds.append(y_pred.detach().cpu())
             targets.append(target.detach().cpu())
             if i % 100 == 0:
-                print(f"Epoch {epoch}, iter {i}, loss: {loss.item()}, accuracy: {accuracy*100}%")
-        print("\n -------------------------------------------------------- \n")
-        print(f"Epoch {epoch} completed. Avg loss: {running_loss / len(train_dataloader)}")
-        print("\n -------------------------------------------------------- \n")
+                log.info(f"Epoch {epoch}, iter {i}, loss: {loss.item()}, accuracy: {accuracy*100}%")            
+
+        log.info("\n -------------------------------------------------------- \n")
+        log.info(f"Epoch {epoch} completed. Avg loss: {running_loss / len(train_dataloader)}")
+        log.info("\n -------------------------------------------------------- \n")
     
-    print("Big summer body done, saving model...")
-    torch.save(model.state_dict(), DATA_ROOT / f"emotion_model_{datetime.now()}.pth")
+    log.info("Big summer body done, strong and lean now!")
+    torch.save(model.state_dict(), DATA_ROOT / f"emotion_model.pth")
     return None
 
 
