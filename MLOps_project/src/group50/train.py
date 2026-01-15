@@ -3,6 +3,7 @@ from pathlib import Path
 
 import hydra
 import torch
+import wandb
 from omegaconf import DictConfig
 
 from group50.data import emotion_data
@@ -14,6 +15,7 @@ DATA_ROOT = PROJECT_ROOT / "models"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
 log = logging.getLogger(__name__)
+@hydra.main(version_base=None, config_path="config/experiments", config_name="training_conf")
 
 
 def train(config: DictConfig) -> None:
@@ -25,6 +27,11 @@ def train(config: DictConfig) -> None:
 
     log.info("Time to get that summer body! We are training now!")
     log.info(f"{lr=}, {batch_size=}, {epochs=}")
+
+    wandb.init(
+        project="MLOps_Group_50_Emotion_Recognition",
+        config={"lr": lr, "batch_size": batch_size, "epochs": epochs},
+    )
 
     model = EmotionModel().to(DEVICE)
     train_set, _ = emotion_data()
@@ -54,8 +61,14 @@ def train(config: DictConfig) -> None:
 
             preds.append(y_pred.detach().cpu())
             targets.append(target.detach().cpu())
+            wandb.log({"train_loss": loss.item(), "train_accuracy": accuracy})
+            
             if i % 100 == 0:
-                log.info(f"Epoch {epoch}, iter {i}, loss: {loss.item()}, accuracy: {accuracy*100}%")
+                log.info(f"Epoch {epoch}, iter {i}, loss: {loss.item()}, accuracy: {accuracy*100}%")   
+                
+                # add a plot of histogram of the gradients
+                grads = torch.cat([p.grad.flatten() for p in model.parameters() if p.grad is not None], 0)
+                wandb.log({"gradients": wandb.Histogram(grads)})
 
         log.info("\n -------------------------------------------------------- \n")
         log.info(f"Epoch {epoch} completed. Avg loss: {running_loss / len(train_dataloader)}")
