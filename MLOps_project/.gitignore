@@ -6,6 +6,9 @@ manual_test/
 # data files
 data/processed/
 
+# No outputs
+outputs/
+
 # other local dev info
 .vscode/
 
