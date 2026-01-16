@@ -2,7 +2,7 @@
 
 ## Goal
 
-This repository contains the final project for the DTU course MLOps (02476). The goal is to create an end-to-end machine learning project that combines initial data exploration, model training, evaluation, deployment and monitoring using techniques from the field of Machine Learning Operations (MLOps). 
+This repository contains the final project for the DTU course MLOps (02476). The goal is to create an end-to-end machine learning project that combines initial data exploration, model training, evaluation, deployment and monitoring using techniques from the field of Machine Learning Operations (MLOps).
 
 ## Repository layout
 
@@ -120,7 +120,7 @@ will check the repositories and the code to verify your answers.
 * [ ] Get some continuous integration running on the GitHub repository (M17)
 * [ ] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
 * [ ] Add a linting step to your continuous integration (M17)
-* [ ] Add pre-commit hooks to your version control setup (M18)
+* [X] Add pre-commit hooks to your version control setup (M18)
 * [ ] Add a continues workflow that triggers when data changes (M19)
 * [ ] Add a continues workflow that triggers when changes to the model registry is made (M19)
 * [ ] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
@@ -308,7 +308,7 @@ Each group member made their own branch to work on different parts of the projec
 >
 > Answer:
 
-The first thing we did when joining a shared Git repository was to create a branch for each teammember resulting in 5 branches (excluding main). The general workflow was that each member worked on their own branch and when they wanted to merge code into the main branch, they created a pull request. The pull request was then reviewed by at least another member before being approved and merged into the main branch. This process helped both code quality, version control and preventing merge conflicts. 
+The first thing we did when joining a shared Git repository was to create a branch for each teammember resulting in 5 branches (excluding main). The general workflow was that each member worked on their own branch and when they wanted to merge code into the main branch, they created a pull request. The pull request was then reviewed by at least another member before being approved and merged into the main branch. This process helped both code quality, version control and preventing merge conflicts.
 
 ### Question 10
 
