@@ -1,0 +1,10 @@
+# config/experiments/training_conf.yaml
+defaults:
+  - _self_
+
+model_name: "emotion_test"
+
+hyperparameters:
+  lr: 1e-3
+  batch_size: 32
+  epochs: 2
