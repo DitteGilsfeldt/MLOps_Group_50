@@ -13,7 +13,7 @@ from group50.model import EmotionModel
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_ROOT = PROJECT_ROOT / "models"
 
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.mps.is_available() else "cpu")
 
 log = logging.getLogger(__name__)
 
@@ -22,6 +22,9 @@ log = logging.getLogger(__name__)
 
 
 def train(config: DictConfig) -> None:
+    _train_impl(config, use_wandb=True)
+
+def _train_impl(config: DictConfig, use_wandb: bool = True, max_batches: int | None = None):
     """Train a model on emtion_data.
     Args:
         config: Hydra configuration object containing hyperparameters.
@@ -35,12 +38,13 @@ def train(config: DictConfig) -> None:
     log.info("Time to get that summer body! We are training now!")
     log.info(f"{lr=}, {batch_size=}, {epochs=}")
 
-    wandb.init(
-        project="MLOps_Group_50_Emotion_Recognition",
-        entity="zilverwood-dtu",
-        config={"lr": lr, "batch_size": batch_size, "epochs": epochs},
-        name=f"{model_name}_bs{batch_size}_lr{lr}_ep{epochs}",
-    )
+    if use_wandb:
+        wandb.init(
+            project="MLOps_Group_50_Emotion_Recognition",
+            entity="zilverwood-dtu",
+            config={"lr": lr, "batch_size": batch_size, "epochs": epochs},
+            name=f"{model_name}_bs{batch_size}_lr{lr}_ep{epochs}",
+        )
 
     model = EmotionModel().to(DEVICE)
     train_set, _ = emotion_data()
@@ -54,12 +58,19 @@ def train(config: DictConfig) -> None:
     best_accuracy = 0.0
 
     model.train()
+    loss_stats = []
+
+
     for epoch in range(epochs):
         running_loss = 0.0
         model.train()
         preds, targets = [], []
 
         for i, (img, target) in enumerate(train_dataloader):
+
+            if max_batches is not None and i >= max_batches:
+                break
+
             img, target = img.to(DEVICE), target.to(DEVICE)
             optimizer.zero_grad()
             y_pred = model(img)
@@ -75,18 +86,26 @@ def train(config: DictConfig) -> None:
             preds.append(y_pred.detach().cpu())
             targets.append(target.detach().cpu())
 
-            if loss.item() <= best_loss:
+            if epoch == 0 and i == 0:
+                best_loss = loss.item()
+
+            elif loss.item() < best_loss:
                 best_loss = loss.item()
                 save_checkpoint(model, model_name)
 
-            wandb.log({"train_loss": loss.item(), "best_loss": best_loss, "train_accuracy": accuracy, "best_accuracy": best_accuracy})
+            if use_wandb:
+                wandb.log({"train_loss": loss.item(), "best_loss": best_loss, "train_accuracy": accuracy, "best_accuracy": best_accuracy})
             
             if i % 100 == 0:
                 log.info(f"Epoch {epoch}, iter {i}, loss: {loss.item()}, accuracy: {accuracy*100}%")   
                 
                 # add a plot of histogram of the gradients
                 grads = torch.cat([p.grad.flatten().detach() for p in model.parameters() if p.grad is not None], 0)
-                wandb.log({"gradients": wandb.Histogram(grads.cpu())})
+                if use_wandb:
+                    wandb.log({"gradients": wandb.Histogram(grads.cpu())})
+
+
+        loss_stats.append(running_loss / len(train_dataloader))
 
         log.info("\n -------------------------------------------------------- \n")
         log.info(f"Epoch {epoch} completed. Avg loss: {running_loss / len(train_dataloader)}")
@@ -98,7 +117,7 @@ def train(config: DictConfig) -> None:
     shutil.rmtree(PROJECT_ROOT / "wandb", ignore_errors=True)
     shutil.rmtree("wandb", ignore_errors=True)
     
-    return None
+    return loss_stats
 
 def save_checkpoint(model, model_name):
     """Function to save model checkpoint
