@@ -1,0 +1,8 @@
+# config/experiments/ex2.yaml
+defaults:
+  - training_conf
+
+model_name: "emotion_m" 
+
+hyperparameters:
+  epochs: 5
