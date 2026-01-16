@@ -15,8 +15,11 @@ DATA_ROOT = PROJECT_ROOT / "models"
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-log = logging.getLogger(__name__)
-@hydra.main(version_base=None, config_path="config/experiments", config_name="training_conf")
+log = logging.getLogger(__name__)¨
+
+
+@hydra.main(version_base=None, config_path=str(PROJECT_ROOT / "config" / "experiments"), config_name="training_conf")
+
 
 def train(config: DictConfig) -> None:
     """Train a model on emtion_data.
