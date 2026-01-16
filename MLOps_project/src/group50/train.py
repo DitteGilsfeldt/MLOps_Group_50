@@ -18,13 +18,13 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 log = logging.getLogger(__name__)
 @hydra.main(version_base=None, config_path="config/experiments", config_name="training_conf")
 
-
 def train(config: DictConfig) -> None:
     """Train a model on emtion_data."""
 
     lr = config.hyperparameters.lr
     batch_size = config.hyperparameters.batch_size
     epochs = config.hyperparameters.epochs
+    model_name = config.model_name
 
     log.info("Time to get that summer body! We are training now!")
     log.info(f"{lr=}, {batch_size=}, {epochs=}")
@@ -33,6 +33,7 @@ def train(config: DictConfig) -> None:
         project="MLOps_Group_50_Emotion_Recognition",
         entity="zilverwood-dtu",
         config={"lr": lr, "batch_size": batch_size, "epochs": epochs},
+        name=f"{model_name}_bs{batch_size}_lr{lr}_ep{epochs}",
     )
 
     model = EmotionModel().to(DEVICE)
@@ -69,17 +70,17 @@ def train(config: DictConfig) -> None:
                 log.info(f"Epoch {epoch}, iter {i}, loss: {loss.item()}, accuracy: {accuracy*100}%")   
                 
                 # add a plot of histogram of the gradients
-                grads = torch.cat([p.grad.flatten() for p in model.parameters() if p.grad is not None], 0)
-                wandb.log({"gradients": wandb.Histogram(grads)})
+                grads = torch.cat([p.grad.flatten().detach() for p in model.parameters() if p.grad is not None], 0)
+                wandb.log({"gradients": wandb.Histogram(grads.cpu())})
 
         log.info("\n -------------------------------------------------------- \n")
         log.info(f"Epoch {epoch} completed. Avg loss: {running_loss / len(train_dataloader)}")
         log.info("\n -------------------------------------------------------- \n")
 
     log.info("Big summer body done, strong and lean now!")
-    torch.save(model.state_dict(), DATA_ROOT / "emotion_model.pth")
+    torch.save(model.state_dict(), DATA_ROOT / f"{model_name}.pth")
     
-    # Clean up local wandb directory (logs are synced to WandB servers)
+    # Clean up local wandb directory 
     shutil.rmtree(PROJECT_ROOT / "wandb", ignore_errors=True)
     shutil.rmtree("wandb", ignore_errors=True)
     

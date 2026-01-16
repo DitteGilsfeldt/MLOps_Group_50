@@ -2,5 +2,7 @@
 defaults:
   - training_conf
 
+model_name: "emotion_m" 
+
 hyperparameters:
   epochs: 30
