@@ -19,7 +19,10 @@ log = logging.getLogger(__name__)
 @hydra.main(version_base=None, config_path="config/experiments", config_name="training_conf")
 
 def train(config: DictConfig) -> None:
-    """Train a model on emtion_data."""
+    """Train a model on emtion_data.
+    Args:
+        config: Hydra configuration object containing hyperparameters.
+    """
 
     lr = config.hyperparameters.lr
     batch_size = config.hyperparameters.batch_size
@@ -44,11 +47,15 @@ def train(config: DictConfig) -> None:
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
+    best_loss = float('inf')
+    best_accuracy = 0.0
+
     model.train()
     for epoch in range(epochs):
         running_loss = 0.0
         model.train()
         preds, targets = [], []
+
         for i, (img, target) in enumerate(train_dataloader):
             img, target = img.to(DEVICE), target.to(DEVICE)
             optimizer.zero_grad()
@@ -64,7 +71,12 @@ def train(config: DictConfig) -> None:
 
             preds.append(y_pred.detach().cpu())
             targets.append(target.detach().cpu())
-            wandb.log({"train_loss": loss.item(), "train_accuracy": accuracy})
+
+            if loss.item() <= best_loss:
+                best_loss = loss.item()
+                save_checkpoint(model, model_name)
+
+            wandb.log({"train_loss": loss.item(), "best_loss": best_loss, "train_accuracy": accuracy, "best_accuracy": best_accuracy})
             
             if i % 100 == 0:
                 log.info(f"Epoch {epoch}, iter {i}, loss: {loss.item()}, accuracy: {accuracy*100}%")   
@@ -78,13 +90,21 @@ def train(config: DictConfig) -> None:
         log.info("\n -------------------------------------------------------- \n")
 
     log.info("Big summer body done, strong and lean now!")
-    torch.save(model.state_dict(), DATA_ROOT / f"{model_name}.pth")
     
     # Clean up local wandb directory 
     shutil.rmtree(PROJECT_ROOT / "wandb", ignore_errors=True)
     shutil.rmtree("wandb", ignore_errors=True)
     
     return None
+
+def save_checkpoint(model, model_name):
+    """Function to save model checkpoint
+    
+    Args:
+        model: The model to save.
+        model_name: The name to use for the saved model file.
+    """
+    torch.save(model.state_dict(), DATA_ROOT / f"{model_name}.pth")
 
 
 if __name__ == "__main__":
