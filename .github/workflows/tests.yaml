@@ -28,16 +28,14 @@ jobs:
 
       - name: install uv
         uses: astral-sh/setup-uv@v7
-      
-      - name: move to project directory
-        run: |
-          cd MLOps_project
 
       - name: Install dependencies
+        working-directory: MLOps_project
         run: |
           uv sync --refresh
 
 
       - name: Run tests & coverage
+        working-directory: MLOps_project
         run: |
           uv run pytest
