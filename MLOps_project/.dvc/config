@@ -1,0 +1,4 @@
+[core]
+    remote = storage-remote
+['remote "storage-remote"']
+    url = gs://group50-emotion-data/dvc_store
