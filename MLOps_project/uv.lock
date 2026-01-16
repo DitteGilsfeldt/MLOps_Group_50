@@ -272,6 +272,7 @@ name = "group50"
 version = "0.0.1"
 source = { editable = "." }
 dependencies = [
+    { name = "coverage" },
     { name = "datetime" },
     { name = "hydra-core" },
     { name = "logging" },
@@ -317,6 +318,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "coverage" },
     { name = "datetime" },
     { name = "hydra-core", specifier = ">=1.3" },
     { name = "logging" },
