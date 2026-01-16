@@ -31,8 +31,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv sync -r requirements.txt
-          uv pip list
+          uv sync --refresh
 
 
       - name: Run tests & coverage
