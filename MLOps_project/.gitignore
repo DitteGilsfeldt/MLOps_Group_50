@@ -184,3 +184,4 @@ cython_debug/
 
 # avoid pushing wandb logs
 wandb/
+/data
