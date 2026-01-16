@@ -47,9 +47,10 @@ def _train_impl(config: DictConfig, use_wandb: bool = True, max_batches: int | N
         )
 
     model = EmotionModel().to(DEVICE)
-    train_set, _ = emotion_data()
+    train_set, test_set = emotion_data()
 
     train_dataloader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True)
+    test_dataloader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False)
 
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -57,9 +58,7 @@ def _train_impl(config: DictConfig, use_wandb: bool = True, max_batches: int | N
     best_loss = float('inf')
     best_accuracy = 0.0
 
-    model.train()
     loss_stats = []
-
 
     for epoch in range(epochs):
         running_loss = 0.0
@@ -88,6 +87,7 @@ def _train_impl(config: DictConfig, use_wandb: bool = True, max_batches: int | N
 
             if epoch == 0 and i == 0:
                 best_loss = loss.item()
+                best_accuracy = accuracy
 
             elif loss.item() < best_loss:
                 best_loss = loss.item()
@@ -98,14 +98,28 @@ def _train_impl(config: DictConfig, use_wandb: bool = True, max_batches: int | N
             
             if i % 100 == 0:
                 log.info(f"Epoch {epoch}, iter {i}, loss: {loss.item()}, accuracy: {accuracy*100}%")   
-                
-                # add a plot of histogram of the gradients
-                grads = torch.cat([p.grad.flatten().detach() for p in model.parameters() if p.grad is not None], 0)
-                if use_wandb:
-                    wandb.log({"gradients": wandb.Histogram(grads.cpu())})
 
+        model.eval()
+        val_loss = 0.0
+        val_correct = 0
+        val_total = 0
+
+        with torch.no_grad():
+            for img, target in test_dataloader:
+                img, target = img.to(DEVICE), target.to(DEVICE)
+                output = model(img)
+                val_loss += loss_fn(output, target).item()
+                val_correct += (output.argmax(dim=1) == target).float().sum().item()
+                val_total += target.size(0)
+
+        val_accuracy = val_correct / val_total
+        val_loss /= len(test_dataloader)
+
+        if use_wandb:
+            wandb.log({"validation_loss": val_loss, "validation_accuracy": val_accuracy})
 
         loss_stats.append(running_loss / len(train_dataloader))
+
 
         log.info("\n -------------------------------------------------------- \n")
         log.info(f"Epoch {epoch} completed. Avg loss: {running_loss / len(train_dataloader)}")
