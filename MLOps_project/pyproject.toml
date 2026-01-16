@@ -55,7 +55,12 @@ line-length = 120
 select = ["E", "W", "F", "I", "N"]
 
 [tool.coverage.run]
-omit = ["tests/*"]
+source = ["group50"]
+omit = ["tests/*", "**/_remote_module_non_scriptable.py",]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
 
 [project.optional-dependencies]
 cpu = ["torch>=2.6.0"]

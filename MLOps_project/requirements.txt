@@ -11,3 +11,4 @@ omegaconf
 hydra-core>=1.3
 logging
 wandb
+coverage
