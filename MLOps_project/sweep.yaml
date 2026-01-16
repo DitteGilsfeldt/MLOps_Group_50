@@ -1,18 +1,25 @@
-program: train
+program: src/group50/train.py
 name: hyperparameter_sweep
 project: MLOps_Group_50_Emotion_Recognition
 entity: zilverwood-dtu
 method: bayes
+command:
+  - ${env}
+  - ${interpreter}
+  - ${program}
+  - hyperparameters.lr=${lr}
+  - hyperparameters.batch_size=${batch_size}
+  - hyperparameters.epochs=${epochs}
 metric:
-    goal: minimize
-    name: validation_loss
+  goal: minimize
+  name: validation_loss
 parameters:
-    lr:
-        min: 0.0001
-        max: 0.1
-        distribution: log_uniform
-    batch_size:
-        values: [16, 32, 64]
-    epochs:
-        values: [5, 10, 15]
+  lr:
+    min: 0.0001
+    max: 0.1
+    distribution: log_uniform
+  batch_size:
+    values: [16, 32, 64]
+  epochs:
+    values: [5, 10, 15]
 run_cap: 10
