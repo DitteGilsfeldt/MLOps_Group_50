@@ -2,6 +2,8 @@
 defaults:
   - _self_
 
+model_name: "emotion_m" 
+
 hyperparameters:
   lr: 1e-3
   batch_size: 32
