@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import os
 import torch
 import torchvision.transforms as transforms
 from PIL import Image
@@ -76,6 +76,12 @@ def emotion_data() -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     test_set = torch.utils.data.TensorDataset(test_images, test_target)
     return train_set, test_set
 
+def dataset_statistics(datadir: str = "data") -> None:
+    print("Running dataset statistics")
+    print("Data directory:", datadir)
+
+    files = os.listdir(datadir)
+    print("Number of files:", len(files))
 
 if __name__ == "__main__":
     preprocess_data()

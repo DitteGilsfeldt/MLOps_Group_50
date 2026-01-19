@@ -1,0 +1,39 @@
+name: CML - Data Change
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '**/*.dvc'
+      - '.dvc/**'
+
+jobs:
+  data_checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          pip install -r MLOps_project/requirements.txt
+          pip install dvc-gs
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Pull data from GCS
+        run: dvc pull --no-run-cache
+
+      - name: Run dataset statistics
+        run: |
+          PYTHONPATH=MLOps_project/src python -c \
+          "from group50.data import dataset_statistics; dataset_statistics()"
