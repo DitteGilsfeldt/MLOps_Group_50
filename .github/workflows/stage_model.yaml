@@ -1,0 +1,17 @@
+name: CML - Staged Model
+
+on:
+  repository_dispatch:
+    types: [staged_model]
+
+jobs:
+  staged_model_info:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Show staged model info
+        run: |
+          echo "Model staged"
+          echo "Artifact: ${{ github.event.client_payload.artifact_version }}"
+          echo "Project:  ${{ github.event.client_payload.project_name }}"
+          echo "Entity:   ${{ github.event.client_payload.entity_name }}"
