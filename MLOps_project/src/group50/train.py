@@ -1,10 +1,7 @@
 import logging
 from pathlib import Path
-
-import hydra
 import torch
 import wandb
-from omegaconf import DictConfig
 import shutil
 
 from group50.data import emotion_data
@@ -17,11 +14,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.mp
 
 log = logging.getLogger(__name__)
 
-
-
-
-
-def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name: str = "emotion_model"):
+def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name: str = "emotion_model", wb = True):
     """Train a model on emtion_data.
     Args:
         config: Hydra configuration object containing hyperparameters.
@@ -32,12 +25,13 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
         format='%(asctime)s - %(message)s'
     )
 
-    wandb.init(
-        project="MLOps_Group_50_Emotion_Recognition",
-        entity="zilverwood-dtu",
-        config={"lr": lr, "batch_size": batch_size, "epochs": epochs},
-        name=f"{model_name}_bs{batch_size}_lr{lr}_ep{epochs}",
-    )
+    if wb:
+        wandb.init(
+            project="MLOps_Group_50_Emotion_Recognition",
+            entity="zilverwood-dtu",
+            config={"lr": lr, "batch_size": batch_size, "epochs": epochs},
+            name=f"{model_name}_bs{batch_size}_lr{lr}_ep{epochs}",
+        )
 
     log.info("Time to get that summer body! We are training now!")
     log.info(f"{lr=}, {batch_size=}, {epochs=}")
@@ -86,7 +80,8 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
                 best_accuracy = accuracy
                 save_checkpoint(model, model_name)
 
-            wandb.log({"train_loss": loss.item(), "best_loss": best_loss, "train_accuracy": accuracy, "best_accuracy": best_accuracy})
+            if wb:
+                wandb.log({"train_loss": loss.item(), "best_loss": best_loss, "train_accuracy": accuracy, "best_accuracy": best_accuracy})
             
             if i % 100 == 0:
                 log.info(f"Epoch {epoch}, iter {i}, loss: {loss.item()}, accuracy: {accuracy*100}%")   
@@ -107,7 +102,8 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
         val_accuracy = val_correct / val_total
         val_loss /= len(test_dataloader)
 
-        wandb.log({"validation_loss": val_loss, "validation_accuracy": val_accuracy})
+        if wb:
+            wandb.log({"validation_loss": val_loss, "validation_accuracy": val_accuracy})
 
         loss_stats.append(running_loss / len(train_dataloader))
 
@@ -119,8 +115,9 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
     log.info("Big summer body done, strong and lean now!")
     
     # Clean up local wandb directory 
-    shutil.rmtree(PROJECT_ROOT / "wandb", ignore_errors=True)
-    shutil.rmtree("wandb", ignore_errors=True)
+    if wb:
+        shutil.rmtree(PROJECT_ROOT / "wandb", ignore_errors=True)
+        shutil.rmtree("wandb", ignore_errors=True)
     
     return loss_stats
 
