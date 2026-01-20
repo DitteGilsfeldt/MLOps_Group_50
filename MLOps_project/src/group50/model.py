@@ -26,7 +26,6 @@ class EmotionModel(nn.Module):
         # in_chans=1 are grayscale but 3 is safer for standard ResNet
         self.backbone = timm.create_model(model_name, pretrained=pretrained, num_classes=num_classes, in_chans=3)
 
-
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if x.ndim != 4:
             raise ValueError("Expected input to a 4D tensor")

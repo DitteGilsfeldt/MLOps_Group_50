@@ -1,9 +1,10 @@
 import logging
-from pathlib import Path
-import torch
-import wandb
 import shutil
+from pathlib import Path
 
+import torch
+
+import wandb
 from group50.data import emotion_data
 from group50.model import EmotionModel
 
@@ -14,16 +15,14 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.mp
 
 log = logging.getLogger(__name__)
 
-def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name: str = "emotion_model", wb = True):
+
+def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name: str = "emotion_model", wb=True):
     """Train a model on emtion_data.
     Args:
         config: Hydra configuration object containing hyperparameters.
     """
-    
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(message)s'
-    )
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
     if wb:
         wandb.init(
@@ -45,7 +44,7 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
-    best_loss = float('inf')
+    best_loss = float("inf")
     best_accuracy = 0.0
 
     loss_stats = []
@@ -81,10 +80,17 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
                 save_checkpoint(model, model_name)
 
             if wb:
-                wandb.log({"train_loss": loss.item(), "best_loss": best_loss, "train_accuracy": accuracy, "best_accuracy": best_accuracy})
-            
+                wandb.log(
+                    {
+                        "train_loss": loss.item(),
+                        "best_loss": best_loss,
+                        "train_accuracy": accuracy,
+                        "best_accuracy": best_accuracy,
+                    }
+                )
+
             if i % 100 == 0:
-                log.info(f"Epoch {epoch}, iter {i}, loss: {loss.item()}, accuracy: {accuracy*100}%")   
+                log.info(f"Epoch {epoch}, iter {i}, loss: {loss.item()}, accuracy: {accuracy*100}%")
 
         model.eval()
         val_loss = 0.0
@@ -107,23 +113,23 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
 
         loss_stats.append(running_loss / len(train_dataloader))
 
-
         log.info("\n -------------------------------------------------------- \n")
         log.info(f"Epoch {epoch} completed. Avg loss: {running_loss / len(train_dataloader)}")
         log.info("\n -------------------------------------------------------- \n")
 
     log.info("Big summer body done, strong and lean now!")
-    
-    # Clean up local wandb directory 
+
+    # Clean up local wandb directory
     if wb:
         shutil.rmtree(PROJECT_ROOT / "wandb", ignore_errors=True)
         shutil.rmtree("wandb", ignore_errors=True)
-    
+
     return loss_stats
+
 
 def save_checkpoint(model, model_name):
     """Function to save model checkpoint
-    
+
     Args:
         model: The model to save.
         model_name: The name to use for the saved model file.

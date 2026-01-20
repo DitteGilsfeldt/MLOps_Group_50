@@ -1,16 +1,11 @@
 from contextlib import asynccontextmanager
-from fastapi import HTTPException
 
-import numpy as np
-from typing import Dict
 import torch
-from fastapi import FastAPI, File, UploadFile
-from PIL import Image
-from torchvision import transforms
-from pydantic import BaseModel
-
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from group50.model import EmotionModel
-from group50.data import emotion_data
+from PIL import Image
+from pydantic import BaseModel
+from torchvision import transforms
 
 MODEL_PATH = "../models/emotion_m.pth"
 classes = ["angry", "disgusted", "fearful", "happy", "neutral", "sad", "surprised"]
@@ -25,9 +20,11 @@ transform = transforms.Compose(
     ]
 )
 
+
 class PredictionResponse(BaseModel):
     emotion: str
     confidence: float
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -53,7 +50,7 @@ async def predict_emotion(data: UploadFile = File(...)):
     """Predict emotion from an uploaded image."""
     if data.content_type not in ["image/jpeg", "image/png"]:
         raise HTTPException(status_code=415, detail="YOUR IMAGE IS INVALID!!! PICK ANOTHER ONE >:C")
-    
+
     image = Image.open(data.file).convert("RGB")
     image_tensor = transform(image).unsqueeze(0).to(DEVICE)
 
