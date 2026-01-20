@@ -18,33 +18,29 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.mp
 log = logging.getLogger(__name__)
 
 
-@hydra.main(version_base=None, config_path=str(PROJECT_ROOT / "config" / "experiments"), config_name="training_conf")
 
 
-def train(config: DictConfig) -> None:
-    _train_impl(config, use_wandb=True)
 
-def _train_impl(config: DictConfig, use_wandb: bool = True, max_batches: int | None = None):
+def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name: str = "emotion_model"):
     """Train a model on emtion_data.
     Args:
         config: Hydra configuration object containing hyperparameters.
     """
+    
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(message)s'
+    )
 
-    lr = config.hyperparameters.lr
-    batch_size = config.hyperparameters.batch_size
-    epochs = config.hyperparameters.epochs
-    model_name = config.model_name
+    wandb.init(
+        project="MLOps_Group_50_Emotion_Recognition",
+        entity="zilverwood-dtu",
+        config={"lr": lr, "batch_size": batch_size, "epochs": epochs},
+        name=f"{model_name}_bs{batch_size}_lr{lr}_ep{epochs}",
+    )
 
     log.info("Time to get that summer body! We are training now!")
     log.info(f"{lr=}, {batch_size=}, {epochs=}")
-
-    if use_wandb:
-        wandb.init(
-            project="MLOps_Group_50_Emotion_Recognition",
-            entity="zilverwood-dtu",
-            config={"lr": lr, "batch_size": batch_size, "epochs": epochs},
-            name=f"{model_name}_bs{batch_size}_lr{lr}_ep{epochs}",
-        )
 
     model = EmotionModel().to(DEVICE)
     train_set, test_set = emotion_data()
@@ -66,10 +62,6 @@ def _train_impl(config: DictConfig, use_wandb: bool = True, max_batches: int | N
         preds, targets = [], []
 
         for i, (img, target) in enumerate(train_dataloader):
-
-            if max_batches is not None and i >= max_batches:
-                break
-
             img, target = img.to(DEVICE), target.to(DEVICE)
             optimizer.zero_grad()
             y_pred = model(img)
@@ -91,10 +83,10 @@ def _train_impl(config: DictConfig, use_wandb: bool = True, max_batches: int | N
 
             elif loss.item() < best_loss:
                 best_loss = loss.item()
+                best_accuracy = accuracy
                 save_checkpoint(model, model_name)
 
-            if use_wandb:
-                wandb.log({"train_loss": loss.item(), "best_loss": best_loss, "train_accuracy": accuracy, "best_accuracy": best_accuracy})
+            wandb.log({"train_loss": loss.item(), "best_loss": best_loss, "train_accuracy": accuracy, "best_accuracy": best_accuracy})
             
             if i % 100 == 0:
                 log.info(f"Epoch {epoch}, iter {i}, loss: {loss.item()}, accuracy: {accuracy*100}%")   
@@ -115,8 +107,7 @@ def _train_impl(config: DictConfig, use_wandb: bool = True, max_batches: int | N
         val_accuracy = val_correct / val_total
         val_loss /= len(test_dataloader)
 
-        if use_wandb:
-            wandb.log({"validation_loss": val_loss, "validation_accuracy": val_accuracy})
+        wandb.log({"validation_loss": val_loss, "validation_accuracy": val_accuracy})
 
         loss_stats.append(running_loss / len(train_dataloader))
 
