@@ -4,13 +4,12 @@ import pytest
 import torch
 import hydra
 
-from hydra import initialize, compose
 from group50.data import emotion_data
 from group50.model import EmotionModel
 from omegaconf import DictConfig
 from pathlib import Path
 
-from group50.train import _train_impl
+from group50.train import train
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 device = torch.device("mps" if torch.mps.is_available() else "cpu")
@@ -32,14 +31,11 @@ REQUIRED_FILES = [
 # TEST EVAL SKAL KUNNE EVALERE RESULTET FRA DEN HER PY FIL
 
 def test_training_pipeline():
-    with initialize(version_base=None, config_path="../config/testings"):
-        config = compose(config_name="train_test1_conf")
+    loss_stats = train(lr=0.001, batch_size=32, epochs=2, model_name="emotion_test", wb=False)
 
-        loss_stats = _train_impl(config, use_wandb=False, max_batches=2)
-
-        model_path = PROJECT_ROOT / "models" / "emotion_test.pth"
-        
-        assert len(loss_stats) >= 2
-        assert all(torch.isfinite(torch.tensor(loss_stats)))
-        assert model_path.exists()
+    model_path = PROJECT_ROOT / "models" / "emotion_test.pth"
+    
+    assert len(loss_stats) >= 2
+    assert all(torch.isfinite(torch.tensor(loss_stats)))
+    assert model_path.exists()
 
