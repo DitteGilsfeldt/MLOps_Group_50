@@ -1,14 +1,8 @@
 import os
+from pathlib import Path
 
 import pytest
 import torch
-import hydra
-
-from group50.data import emotion_data
-from group50.model import EmotionModel
-from omegaconf import DictConfig
-from pathlib import Path
-
 from group50.train import train
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -25,7 +19,6 @@ REQUIRED_FILES = [
 
 @pytest.mark.skipif(not all(os.path.exists(p) for p in REQUIRED_FILES), reason="Processed data files not found")
 
-
 # KALD PÅ VORES EGEN
 # GEM MODEL DER HEDDER NOGET VI SELV VÆLGER
 # TEST EVAL SKAL KUNNE EVALERE RESULTET FRA DEN HER PY FIL
@@ -34,8 +27,7 @@ def test_training_pipeline():
     loss_stats = train(lr=0.001, batch_size=32, epochs=2, model_name="emotion_test", wb=False)
 
     model_path = PROJECT_ROOT / "models" / "emotion_test.pth"
-    
+
     assert len(loss_stats) >= 2
     assert all(torch.isfinite(torch.tensor(loss_stats)))
     assert model_path.exists()
-
