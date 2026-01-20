@@ -7,9 +7,7 @@ command:
   - ${env}
   - ${interpreter}
   - ${program}
-  - hyperparameters.lr=${lr}
-  - hyperparameters.batch_size=${batch_size}
-  - hyperparameters.epochs=${epochs}
+  - ${wandb_arg}
 metric:
   goal: minimize
   name: validation_loss
