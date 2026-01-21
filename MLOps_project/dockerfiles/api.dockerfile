@@ -17,4 +17,4 @@ COPY src ./src
 RUN uv sync --frozen
 
 # 7. Default for API (Vertex AI will override this during training)
-ENTRYPOINT ["uv", "run", "uvicorn", "src.group50.api:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["uv", "run", "python", "-m", "uvicorn", "src.group50.api:app", "--host", "0.0.0.0", "--port", "${PORT}"]
