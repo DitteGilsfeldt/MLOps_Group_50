@@ -165,7 +165,9 @@ We used the TIMM library as a third-party package in our project, as it provides
 >
 > Answer:
 
-We used UV for managing environments, and all of our dependencies are in the and a pyproject.toml file linked to requirement.txt which manages our packages. Furthermore, we used Cookiecutter to create the initial project structure. To uphold the PEP8 standard we used Ruff for linting formatting and MyPy for typing.
+We used UV for managing environments, and all of our dependencies are in the and a `pyproject.toml` file which manages our packages. In the beginning, we linked the `pyproject.toml` file to a requirements.txt file for easier installation of dependencies, but later, we had to restrict ourselves to only using the `pyproject.toml` file due to .dvc issues when having a `requirements.txt` file.
+
+Furthermore, we used Cookiecutter to create the initial project structure. To uphold the PEP8 standard we used Ruff for linting formatting and MyPy for typing.
 
 If a new team member were to join, all they have to do is, first, ensure they have UV installed on their computer, then from the main repository they have to do ```cd MLOps_project``` to get into the project folder, and then run one of the following commands according to their hardware setup:
 
@@ -200,9 +202,7 @@ uv sync --extra mps --index pytorch-mps
 >
 > Answer:
 
-> From the cookiecutter template, we have filled out the `data.py`, `models.py`, `train.py`, and `api.py` files in the `src/project_name/` folder. We have also added configuration files in the `configs/` folder to manage our hyperparameters and experiment settings.
-
-> [TO DO: ADD MORE]
+From the cookiecutter template, we have filled out the `data.py`, `models.py`, `train.py`, and `api.py` files in the `src/project_name/` folder. We have also added configuration files in the `configs/` folder to manage our hyperparameters and experiment settings. We later made two versions of the `train.py`file. The one keeping the original name implements w&b logging and sweeping, meanwhile the other named `train_hydra_ver.py` implements hydra configs and w&b logging - this was required since hyperparameter sweeping along with hydra gave conflicts.
 
 ### Question 6
 
@@ -217,9 +217,7 @@ uv sync --extra mps --index pytorch-mps
 >
 > Answer:
 
-For code quality and format, we went for PEP8 standards using Ruff for linting and formatting?
-
-[TO DO: CHECK THIS OR MAYBE CONSIDER MYPY AS WELL]
+For code quality and format, we went for PEP8 standards using Ruff for linting and formatting. These formatting steps were required before mergning a pull request with the main repository, as unit tests were created to see, if code followed the required standards. If not, the unit tests on Github actions would fail.
 
 ## Version control
 
@@ -240,7 +238,10 @@ Each group member made their own branch to work on different parts of the projec
 >
 > Answer:
 
---- question 7 fill here ---
+We implemented 3 Pytests testing the code (data, training and model structure), for instance, the training test file would use the training function defined in `train.py` and with a set of hydra configs specifically for testing, and `test_training.py` would call a test version of the model named `emotion_test.pth` and assert if the loss is decreasing. This is useful, as `emotion_test.pth` could further be used for testing the evaluation script. So, instead of feeding a model trained on numerous epochs, we could use a simple model on only 2 epochs for running tests.
+
+
+[ADD MORE WHEN API IS DONE]
 
 ### Question 8
 
@@ -259,7 +260,7 @@ Each group member made their own branch to work on different parts of the projec
 
 ### Question 9
 
-> **Did you workflow include using branches and pull requests? If yes, explain how. If not, explain how branches and**
+> **Did your workflow include using branches and pull requests? If yes, explain how. If not, explain how branches and**
 > **pull request can help improve version control.**
 >
 > Recommended answer length: 100-200 words.
@@ -286,6 +287,8 @@ The first thing we did when joining a shared Git repository was to create a bran
 > Answer:
 
 --- question 10 fill here ---
+
+Yes DVC was used for managing data in out project remotely, as we uploaded our large quantity of data to a GCP bucket and linked it with DVC. This way, we could easily version control our data without having to store it directly in the Git repository, which would have been impractical due to the size of the dataset.
 
 ### Question 11
 
