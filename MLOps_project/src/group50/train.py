@@ -50,6 +50,8 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
 
     loss_stats = []
 
+    best_val_loss = float("inf")
+    
     for epoch in range(epochs):
         running_loss = 0.0
         model.train()
@@ -97,7 +99,6 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
         val_loss = 0.0
         val_correct = 0
         val_total = 0
-        best_val_loss = float("inf")
 
         with torch.no_grad():
             for img, target in test_dataloader:
@@ -140,22 +141,17 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
 
 
 def save_checkpoint(model, model_name):
-    # Vertex AI automatically sets AIP_MODEL_DIR to a GCS path
-    model_dir = os.environ.get("AIP_MODEL_DIR")
+    cloud_save_dir = "/gcs/lofty-root-484207-a0-models/training_results"
+    local_save_dir = "models"
 
-    if model_dir:
-        # If running in Vertex AI, save directly to GCS using GCSFuse path
-        # Vertex mounts gs:// buckets under /gcs/
-        target_path = model_dir.replace("gs://", "/gcs/")
-        save_path = Path(target_path) / f"{model_name}.pth"
-        save_path.parent.mkdir(parents=True, exist_ok=True)
-    else:
-        # Fallback for local training
-        save_path = DATA_ROOT / f"{model_name}.pth"
-
+    save_dir = cloud_save_dir if os.path.exists("/gcs") else local_save_dir
+    
+    os.makedirs(save_dir, exist_ok=True)
+    
+    save_path = os.path.join(save_dir, f"{model_name}.pth")
+    
+    print(f"Saving model to: {save_path}")
     torch.save(model.state_dict(), save_path)
-    log.info(f"Model saved to: {save_path}")
-
 
 if __name__ == "__main__":
     train()
