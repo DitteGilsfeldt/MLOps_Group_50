@@ -141,7 +141,7 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
 
 
 def save_checkpoint(model, model_name):
-    cloud_save_dir = "/gcs/lofty-root-484207-a0-models/training_results"
+    cloud_save_dir = "/gcs/group50-emotion-data/training_results"
     local_save_dir = "models"
 
     save_dir = cloud_save_dir if os.path.exists("/gcs") else local_save_dir
