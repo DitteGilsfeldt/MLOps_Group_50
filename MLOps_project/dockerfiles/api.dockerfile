@@ -1,12 +1,20 @@
-FROM ghcr.io/astral-sh/uv:python3.12-alpine AS base
+# 1. Switch from 'alpine' to 'slim-bookworm' for PyTorch compatibility
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS base
 
-COPY uv.lock uv.lock
-COPY pyproject.toml pyproject.toml
+# 2. Set working directory
+WORKDIR /app
 
+# 3. Copy only dependency files first to speed up builds
+COPY uv.lock pyproject.toml ./
+
+# 4. Install dependencies (This will now include torch correctly)
 RUN uv sync --frozen --no-install-project
 
-COPY src src/
+# 5. Copy your source code
+COPY src ./src
 
+# 6. Final sync to include your local package
 RUN uv sync --frozen
 
+# 7. Default for API (Vertex AI will override this during training)
 ENTRYPOINT ["uv", "run", "uvicorn", "src.group50.api:app", "--host", "0.0.0.0", "--port", "8000"]
