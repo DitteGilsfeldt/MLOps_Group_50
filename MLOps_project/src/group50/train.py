@@ -1,9 +1,11 @@
 import logging
+import os
 import shutil
 from pathlib import Path
-import os
+
 import torch
 import wandb
+
 from group50.data import emotion_data
 from group50.model import EmotionModel
 
@@ -76,7 +78,7 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
             elif loss.item() < best_loss:
                 best_loss = loss.item()
                 best_accuracy = accuracy
-                save_checkpoint(model, model_name)
+                # save_checkpoint(model, model_name)
 
             if wb:
                 wandb.log(
@@ -95,6 +97,7 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
         val_loss = 0.0
         val_correct = 0
         val_total = 0
+        best_val_loss = float("inf")
 
         with torch.no_grad():
             for img, target in test_dataloader:
@@ -107,8 +110,18 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
         val_accuracy = val_correct / val_total
         val_loss /= len(test_dataloader)
 
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            save_checkpoint(model, model_name)
+
         if wb:
-            wandb.log({"validation_loss": val_loss, "validation_accuracy": val_accuracy})
+            wandb.log(
+                {
+                    "validation_loss": val_loss,
+                    "validation_accuracy": val_accuracy,
+                    "best_validation_loss": best_val_loss,
+                }
+            )
 
         loss_stats.append(running_loss / len(train_dataloader))
 
@@ -129,17 +142,17 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
 def save_checkpoint(model, model_name):
     # Vertex AI automatically sets AIP_MODEL_DIR to a GCS path
     model_dir = os.environ.get("AIP_MODEL_DIR")
-    
+
     if model_dir:
         # If running in Vertex AI, save directly to GCS using GCSFuse path
         # Vertex mounts gs:// buckets under /gcs/
-        target_path = model_dir.replace("gs://", "/gcs/") 
+        target_path = model_dir.replace("gs://", "/gcs/")
         save_path = Path(target_path) / f"{model_name}.pth"
         save_path.parent.mkdir(parents=True, exist_ok=True)
     else:
         # Fallback for local training
         save_path = DATA_ROOT / f"{model_name}.pth"
-        
+
     torch.save(model.state_dict(), save_path)
     log.info(f"Model saved to: {save_path}")
 
