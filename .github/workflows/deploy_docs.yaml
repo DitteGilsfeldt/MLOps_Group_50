@@ -1,0 +1,37 @@
+name: Deploy docs
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        working-directory: MLOps_project
+        run: |
+          pip install -r requirements.txt
+          pip install mkdocs-material "mkdocstrings[python]"
+
+      - name: Install project (so mkdocstrings can import group50)
+        working-directory: MLOps_project
+        run: pip install -e .
+
+      - name: Deploy docs to gh-pages
+        working-directory: MLOps_project/docs
+        run: mkdocs gh-deploy --force
