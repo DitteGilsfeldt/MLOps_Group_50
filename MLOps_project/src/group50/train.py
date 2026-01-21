@@ -1,9 +1,8 @@
 import logging
 import shutil
 from pathlib import Path
-
+import os
 import torch
-
 import wandb
 from group50.data import emotion_data
 from group50.model import EmotionModel
@@ -128,13 +127,21 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
 
 
 def save_checkpoint(model, model_name):
-    """Function to save model checkpoint
-
-    Args:
-        model: The model to save.
-        model_name: The name to use for the saved model file.
-    """
-    torch.save(model.state_dict(), DATA_ROOT / f"{model_name}.pth")
+    # Vertex AI automatically sets AIP_MODEL_DIR to a GCS path
+    model_dir = os.environ.get("AIP_MODEL_DIR")
+    
+    if model_dir:
+        # If running in Vertex AI, save directly to GCS using GCSFuse path
+        # Vertex mounts gs:// buckets under /gcs/
+        target_path = model_dir.replace("gs://", "/gcs/") 
+        save_path = Path(target_path) / f"{model_name}.pth"
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+    else:
+        # Fallback for local training
+        save_path = DATA_ROOT / f"{model_name}.pth"
+        
+    torch.save(model.state_dict(), save_path)
+    log.info(f"Model saved to: {save_path}")
 
 
 if __name__ == "__main__":

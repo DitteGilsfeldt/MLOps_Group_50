@@ -1,7 +1,7 @@
 name: Build and Push Docker to GCP
 on:
   push:
-    branches: [ "feat/docker-setup", "main" ]  # Triggers on these branches
+    branches: [ "feat/docker-setup", "main", "henrik" ]  # Triggers on these branches
 
 env:
   PROJECT_ID: lofty-root-484207-a0
