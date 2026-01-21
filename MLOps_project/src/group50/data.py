@@ -68,15 +68,16 @@ def preprocess_data() -> None:
 
 
 def emotion_data() -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
-    """Return train and test datasets for emotion recognition."""
-
-    cloud_path = "/gcs/group50-emotion-data/processed"
+    # This path must match the folder you just created
+    cloud_path = "/gcs/group50-emotion-data/processed" 
     local_path = "data/processed"
-
+    
+    # Vertex AI will find 'cloud_path' thanks to GCS FUSE
     data_dir = cloud_path if os.path.exists(cloud_path) else local_path
-
+    
     print(f"Loading data from: {data_dir}")
 
+    # These names match the files I see in your upload
     train_images = torch.load(os.path.join(data_dir, "train_images.pt"))
     train_target = torch.load(os.path.join(data_dir, "train_target.pt"))
     test_images = torch.load(os.path.join(data_dir, "test_images.pt"))
