@@ -6,9 +6,10 @@ pillow
 typer
 pytest
 timm
-datetime
 omegaconf
 hydra-core>=1.3
-logging
 wandb
 coverage
+
+mkdocs-material
+mkdocstrings[python]
