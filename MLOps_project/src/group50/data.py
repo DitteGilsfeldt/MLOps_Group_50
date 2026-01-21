@@ -70,7 +70,7 @@ def preprocess_data() -> None:
 def emotion_data() -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     """Return train and test datasets for emotion recognition."""
     
-    cloud_path = "/gcs/lofty-root-484207-a0-data/processed" 
+    cloud_path = "/gcs/group50-emotion-data/processed" 
     local_path = "data/processed"
 
     data_dir = cloud_path if os.path.exists(cloud_path) else local_path
