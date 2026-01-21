@@ -32,8 +32,8 @@ jobs:
 
       - name: ruff lint check
         run: |
-          ruff check .
+          uv run ruff check .
 
       - name: ruff format check
         run: |
-          ruff format .
+          uv run ruff format .
