@@ -69,12 +69,12 @@ def preprocess_data() -> None:
 
 def emotion_data() -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     """Return train and test datasets for emotion recognition."""
-    
-    cloud_path = "/gcs/group50-emotion-data/processed" 
+
+    cloud_path = "/gcs/group50-emotion-data/processed"
     local_path = "data/processed"
 
     data_dir = cloud_path if os.path.exists(cloud_path) else local_path
-    
+
     print(f"Loading data from: {data_dir}")
 
     train_images = torch.load(os.path.join(data_dir, "train_images.pt"))
@@ -85,6 +85,7 @@ def emotion_data() -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     train_set = torch.utils.data.TensorDataset(train_images, train_target)
     test_set = torch.utils.data.TensorDataset(test_images, test_target)
     return train_set, test_set
+
 
 def dataset_statistics(datadir: str = "data") -> None:
     print("Running dataset statistics")
