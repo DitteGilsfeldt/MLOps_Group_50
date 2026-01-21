@@ -30,6 +30,7 @@ jobs:
         run: uv tool install pre-commit
 
       - name: Run pre-commit autoupdate
+        working-directory: MLOps_project
         run: pre-commit autoupdate
 
       - name: Create Pull Request
