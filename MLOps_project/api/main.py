@@ -11,7 +11,7 @@ from torchvision import transforms
 import numpy as np
 
 MODEL_PATH = "../models/emotion_model.pth"
-DATABASE_PATH = "../data/database.db"
+DATABASE_PATH = "../data/data_drifting/database.db"
 classes = ["angry", "disgusted", "fearful", "happy", "neutral", "sad", "surprised"]
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.mps.is_available() else "cpu")
 
