@@ -81,13 +81,13 @@ will check the repositories and the code to verify your answers.
 * [X] Calculate the code coverage (M16)
 * [X] Get some continuous integration running on the GitHub repository (M17)
 * [X] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
-* [ ] Add a linting step to your continuous integration (M17)
+* [ WORKING ] Add a linting step to your continuous integration (M17)
 * [X] Add pre-commit hooks to your version control setup (M18)
 * [X] Add a continues workflow that triggers when data changes (M19)
 * [X] Add a continues workflow that triggers when changes to the model registry is made (M19)
 * [X] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
 * [X] Create a trigger workflow for automatically building your docker images (M21)
-* [ ] Get your model training in GCP using either the Engine or Vertex AI (M21)
+* [ WORKING ] Get your model training in GCP using either the Engine or Vertex AI (M21)
 * [X] Create a FastAPI application that can do inference using your model (M22)
 * [ ] Deploy your model in GCP using either Functions or Run as the backend (M23)
 * [ ] Write API tests for your application and setup continues integration for these (M24)
@@ -97,8 +97,8 @@ will check the repositories and the code to verify your answers.
 
 ### Week 3
 
-* [ ] Check how robust your model is towards data drifting (M27)
-* [ ] Deploy to the cloud a drift detection API (M27)
+* [ WORKING ] Check how robust your model is towards data drifting (M27)
+* [ WORKING ] Deploy to the cloud a drift detection API (M27)
 * [ ] Instrument your API with a couple of system metrics (M28)
 * [ ] Setup cloud monitoring of your instrumented application (M28)
 * [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
@@ -108,10 +108,10 @@ will check the repositories and the code to verify your answers.
 
 ### Extra
 
-* [ ] Write some documentation for your application (M32)
-* [ ] Publish the documentation to GitHub Pages (M32)
+* [ WORKING ] Write some documentation for your application (M32)
+* [ WORKING ] Publish the documentation to GitHub Pages (M32)
 * [ ] Revisit your initial project description. Did the project turn out as you wanted?
-* [ ] Create an architectural diagram over your MLOps pipeline
+* [ WORKING ] Create an architectural diagram over your MLOps pipeline
 * [ ] Make sure all group members have an understanding about all parts of the project
 * [ ] Uploaded all your code to GitHub
 
