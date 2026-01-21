@@ -38,6 +38,7 @@ dependencies = [
     "typer>=0.15.1",
     "wandb>=0.24.0",
     "uvicorn[standard]",
+    "fastapi==0.115.6",
 ]
 
 [dependency-groups]
