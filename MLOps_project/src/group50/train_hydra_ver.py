@@ -48,8 +48,8 @@ def _train_impl(config: DictConfig, use_wandb: bool = True, max_batches: int | N
     model = EmotionModel().to(DEVICE)
     train_set, test_set = emotion_data()
 
-    train_dataloader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True)
-    test_dataloader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False)
+    train_dataloader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=2)
+    test_dataloader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=2)
 
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
