@@ -223,8 +223,6 @@ Moreover, we later made two versions of the `train.py`file. The one keeping the 
 
 For code quality and format, we went for PEP8 standards using Ruff for linting and formatting. These formatting steps were required before mergning a pull request with the main repository, as unit tests were created to see, if code followed the required standards. If not, the unit tests on Github actions would fail.
 
-[TO DO: svar på det der med typing and documention? måsk? idk...]
-
 Generally, such rules for code quality are important for larger projects, since they help ensure a baseline for the code quality, making it easier for other team members to read and understand each other's code. The code for the entire project will become more uniform, which makes it easier to maintain and extend in the future. In addition to all of this, having proper documentation becomes a benefit for new members, as they can easily understand the purpose and functionality of different parts of the codebase.
 
 ## Version control
@@ -369,6 +367,10 @@ Following training, the used configurations and the logs were automatically save
 
 As mentioned in the question above, we used Hydra for configuration management. Whenever an experiment is run, the configuration file used for that specific experiment is saved in the `outputs/` folder along with the logs and results. This ensures that all the hyperparameters and settings used during the experiment are recorded and can be referenced later.
 
+Since all of our experiment configs exits in `.yaml` files already pushed to the main repository, a person who wants to reproduce an experiment would simply just have to run the training script using one of the config files.
+
+It should also be noted that the outputs folder itself is git-ignored, to not overload the repository with numerous different runs. This will not hinder any reproducibility, since, again, the configs for all experiment settings that we used already exit on the repo.
+
 ### Question 14
 
 > **Upload 1 to 3 screenshots that show the experiments that you have done in W&B (or another experiment tracking**
@@ -412,7 +414,19 @@ These were for the same model runs for the loss chart, but this time, we see val
 >
 > Answer:
 
+We used Docker to esnure reproducibility of our project and how we deployed environments. So, we made docker images for different stages of our project, most notably an API image for model inference.
 
+Our images are built and automatically pused via Github actions. In particular, the `docker-builder.yml` workflow builds the API image from `dockerfiles/api.dockerfile` and pushes it to gcloud artifact registry. Here, every push to main will give us a versioned container image. The image can be built and run locally using:
+
+```bash
+docker build -f dockerfiles/api.dockerfile -t emotion-app .
+```
+
+```bash 
+docker run -p 8080:8080 emotion-app
+```
+
+Link to a dockerfile is [here](MLOps_project/dockerfiles/api.dockerfile).
 
 ### Question 16
 
@@ -427,7 +441,9 @@ These were for the same model runs for the loss chart, but this time, we see val
 >
 > Answer:
 
-[TO DO: someone else GO :)]
+For debugging during early development, we relied on VSCode's built-in debugger and the pdb module (`uv run python -m pdb -c continue my_script.py`) as covered in M12. When integrating Weights & Biases (W&B), we primarily used run logs to surface errors and identify implementation issues. After deploying to GCP Cloud and linking it to W&B, our debugging strategy changed to either leverage W&B logs for model-level insights or GCP's native logging for infrastructure-level issues. LLM models has also been used for debugging and code reviewing on the go.
+
+We didn’t do any code profiling in this project, even though it probably would’ve helped. Profiling could’ve shown us performance bottlenecks early on, but we focused more on getting everything working and deployed than on optimizing. If we were to keep working on this profiling would definitely be something to add.
 
 ## Working in the cloud
 
