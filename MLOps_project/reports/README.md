@@ -545,7 +545,15 @@ We successfully deployed our `FastAPI` application to `Cloud Run` for a serverle
 >
 > Answer:
 
-[TO DO: actually make api unit testing? and then describe it]
+For unit testing we used pytest and implemented tests covering the most critical parts of our API and ML pipeline: data loading, model behavior, and training.
+
+For the data layer, we tested that the processed tensors load correctly, that train and test sets are non-empty, that each sample has shape (3, 48, 48), and that all labels lie in the expected range 0–6. These tests are skipped automatically if the data files are not present.
+
+For the model, we verified that the forward pass returns outputs of shape (batch, 7), that the model contains trainable parameters, and that it raises meaningful errors when given invalid input shapes. We also used parametrized tests to validate behavior for different batch sizes.
+
+For training, we ran a short two-epoch training loop and checked that the loss values are finite and that a model checkpoint is saved.
+
+For load testing, we would use Locust to simulate concurrent users sending requests to the API endpoints. By gradually increasing the number of users, we could measure response times, throughput, and error rates to identify the service’s performance limits and potential bottlenecks.
 
 ### Question 26
 
@@ -655,7 +663,7 @@ When a merge into the main branch happens, it triggers a cloud build in the gcp 
 > Answer:
 
 All five members contributed actively through coding, reviews, debugging sessions, and report/documentation work.
-Student s10666 emphasized testing/QA and CI reliability (unit tests, coverage, linting, pre-commit, API tests, load tests) and supported performance improvements.
+Student s20666 emphasized testing/QA and CI reliability (unit tests, coverage, linting, pre-commit, API tests, load tests) and supported performance improvements.
 
 Student s224215 emphasized project structure and configuration (cookiecutter, data pipeline, dependency management, Hydra configs) and supported API/deployment and architecture documentation.
 
