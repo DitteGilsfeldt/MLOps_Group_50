@@ -16,8 +16,8 @@ REQUIRED_FILES = [
     "data/processed/test_target.pt",
 ]
 
-@pytest.mark.skipif(not all(os.path.exists(p) for p in REQUIRED_FILES), reason="Processed data files not found")
 
+@pytest.mark.skipif(not all(os.path.exists(p) for p in REQUIRED_FILES), reason="Processed data files not found")
 def test_training_pipeline():
     loss_stats = train(lr=0.001, batch_size=32, epochs=2, model_name="emotion_test", wb=False, workers=0)
 
