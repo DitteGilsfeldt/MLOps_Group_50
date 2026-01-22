@@ -22,6 +22,14 @@ jobs:
       - name: install uv
         uses: astral-sh/setup-uv@v7
         
+      - name: Cache uv
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            %LocalAppData%\uv\cache
+          key: ${{ runner.os }}-py${{ matrix.python-version }}-uv-${{ hashFiles('MLOps_project/uv.lock') }}
+            
       - name: Install dependencies
         working-directory: MLOps_project
         run: |
