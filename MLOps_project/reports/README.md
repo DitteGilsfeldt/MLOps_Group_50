@@ -143,7 +143,7 @@ s224081, s225787, s210666, s224215, s210659
 >
 > Answer:
 
-We used the TIMM library as a third-party package in our project, as it provides a wide range of pre-trained models and architectures for image classification tasks. Espeically, we used the ResNet18 model. It is described as the smallest and most lightweight model, hence, making it a popular choice. By using the pre-trained weights from TIMM, we were able to speed up our general development process.
+We used the TIMM library as a third-party package in our project, as it provides a wide range of pre-trained models and architectures for image classification tasks. Espeically, we used the ResNet18 model. It is described as one of the smallest and most lightweight models, hence, making it a popular choice. By using the pre-trained weights from TIMM, we were able to speed up our general development process.
 
 
 ## Coding environment
@@ -165,11 +165,11 @@ We used the TIMM library as a third-party package in our project, as it provides
 >
 > Answer:
 
-We used UV for managing environments, and all of our dependencies are in the and a `pyproject.toml` file which manages our packages. In the beginning, we linked the `pyproject.toml` file to a requirements.txt file for easier installation of dependencies, but later, we had to restrict ourselves to only using the `pyproject.toml` file due to .dvc issues when having a `requirements.txt` file.
+We used UV for managing environments, and all of our dependencies are in the and a `pyproject.toml` file which manages our packages. In the beginning, we linked the `pyproject.toml` file to a requirements.txt file for easier installation of dependencies, but later, we had to restrict ourselves to only using the `pyproject.toml` file due to issues with .dvc when used together with `requirements.txt`.
 
-Furthermore, we used Cookiecutter to create the initial project structure. To uphold the PEP8 standard we used Ruff for linting formatting and MyPy for typing.
+Furthermore, we used Cookiecutter to create the initial project structure. To uphold the PEP8 standard we used Ruff for linting formatting.
 
-If a new team member were to join, all they have to do is, first, ensure they have UV installed on their computer, then from the main repository they have to do ```cd MLOps_project``` to get into the project folder, and then run one of the following commands according to their hardware setup:
+If a new team member were to join (assuming they already cloned the repository), all they have to do is, first, ensure they have UV installed on their computer, then from the main repository they have to do ```cd MLOps_project``` to get into the project folder, and then run one of the following commands according to their hardware setup:
 
 CPU:
 ```bash
@@ -202,7 +202,11 @@ uv sync --extra mps --index pytorch-mps
 >
 > Answer:
 
-From the cookiecutter template, we have filled out the `data.py`, `models.py`, `train.py`, and `api.py` files in the `src/project_name/` folder. We have also added configuration files in the `configs/` folder to manage our hyperparameters and experiment settings. We later made two versions of the `train.py`file. The one keeping the original name implements w&b logging and sweeping, meanwhile the other named `train_hydra_ver.py` implements hydra configs and w&b logging - this was required since hyperparameter sweeping along with hydra gave conflicts.
+From the cookiecutter template, we have filled out the `data.py`, `models.py`, `train.py`, and `api.py` files in the `src/project_name/` folder, and we filled out all python test files under the `tests/` folder. Though, we deleted the `visualize.py` file, since all visualization was done in w&b and gcloud monitoring.
+
+We have also added configuration files in the `configs/` folder to manage our hyperparameters and experiment settings along with a new `api/` folder in the main directory to contain the API code for deployment as well as data drift detection.
+
+Moreover, we later made two versions of the `train.py`file. The one keeping the original name implements w&b logging and sweeping, meanwhile the other named `train_hydra_ver.py` implements hydra configs and w&b logging - this was required since hyperparameter sweeping along with hydra gave conflicts.
 
 ### Question 6
 
@@ -218,6 +222,10 @@ From the cookiecutter template, we have filled out the `data.py`, `models.py`, `
 > Answer:
 
 For code quality and format, we went for PEP8 standards using Ruff for linting and formatting. These formatting steps were required before mergning a pull request with the main repository, as unit tests were created to see, if code followed the required standards. If not, the unit tests on Github actions would fail.
+
+[TO DO: svar på det der med typing and documention? måsk? idk...]
+
+Generally, such rules for code quality are important for larger projects, since they help ensure a baseline for the code quality, making it easier for other team members to read and understand each other's code. The code for the entire project will become more uniform, which makes it easier to maintain and extend in the future. In addition to all of this, having proper documentation becomes a benefit for new members, as they can easily understand the purpose and functionality of different parts of the codebase.
 
 ## Version control
 
@@ -238,10 +246,7 @@ Each group member made their own branch to work on different parts of the projec
 >
 > Answer:
 
-We implemented 3 Pytests testing the code (data, training and model structure), for instance, the training test file would use the training function defined in `train.py` and with a set of hydra configs specifically for testing, and `test_training.py` would call a test version of the model named `emotion_test.pth` and assert if the loss is decreasing. This is useful, as `emotion_test.pth` could further be used for testing the evaluation script. So, instead of feeding a model trained on numerous epochs, we could use a simple model on only 2 epochs for running tests.
-
-
-[ADD MORE WHEN API IS DONE]
+We implemented 4 Pytests testing the code (api, data, training and model structure), for instance, the training test file would use the training function defined in `train.py` and with a set of hydra configs specifically for testing in `config/testings/`, then `test_training.py` would call a test version of the model named `emotion_test.pth` and assert if the loss is decreasing. This is useful, as `emotion_test.pth` could further be used for testing the evaluation script (`evaluate.py`). So, instead of feeding a fully trained model on numerous epochs, we could use a simple model on only 2 epochs for running tests.
 
 ### Question 8
 
@@ -256,7 +261,9 @@ We implemented 3 Pytests testing the code (data, training and model structure), 
 >
 > Answer:
 
---- question 8 fill here ---
+We ran ```uv run coverage run -m pytest tests/``` with tests covering the data, model and training parts of the source code. The data tests covered 16% of the code, model tests covered 83% of the code and training tests covered 100% of the code. The code coverage is far from 100% for our data tests, but coverage for the other tests are high. However, even if we were to reach 100% coverage for all tests, we would not trust the code to be completely error free. Because a 100% coverage only ensures that the code can run, but it does not guarantee that the code is logically correct for different cases (especially edge cases).
+
+While 100% coverage tests is a good indicator for code quality and helps reduce uncertainty, it does not eliminate it.
 
 ### Question 9
 
@@ -271,7 +278,7 @@ We implemented 3 Pytests testing the code (data, training and model structure), 
 >
 > Answer:
 
-The first thing we did when joining a shared Git repository was to create a branch for each teammember resulting in 5 branches (excluding main). The general workflow was that each member worked on their own branch and when they wanted to merge code into the main branch, they created a pull request. The pull request was then reviewed by at least another member before being approved and merged into the main branch. This process helped both code quality, version control and preventing merge conflicts.
+The first thing we did when joining a shared Git repository was to create a branch for each teammember resulting in 5 branches (excluding main). The general workflow was that each member worked on their own branch and when they wanted to merge code into the main branch, they created a pull request. The pull request was then reviewed by at least another member before being approved and it had to undergo unit tests via Github actions, and if approved, it would be merged into the main branch. This process helped both code quality, version control and preventing merge conflicts.
 
 ### Question 10
 
@@ -305,7 +312,7 @@ Yes DVC was used for managing data in out project remotely, as we uploaded our l
 >
 > Answer:
 
---- question 11 fill here ---
+[TO DO: mattias du kan cooke her I believe]
 
 ## Running code and tracking experiments
 
@@ -324,11 +331,16 @@ Yes DVC was used for managing data in out project remotely, as we uploaded our l
 >
 > Answer:
 
-We used Hydra for configuration management. For instance, a config file for `training.py` file were created in the `configs/` folder inside `src/group50/`. Inside this file, we could choose the parameters for training such as learning rate, batch size, and number of epochs. To run an experiment with specific hyperparameters, we would save the changes in the config file and execute the training script using the command:
-
+We used Hydra for configuration management. We mainly focused on configs for the trianing setup, as we saw ourselves testing training procuderes the most. Therefore, `.yaml` files for `training.py` were created in the `configs/` folder. Inside this file, we could choose the parameters for training such as learning rate, batch size, and number of epochs. With different `.yaml` files, we could have numerous training setups, some for large model runs, others for smaller runs. To run an experiment with specific hyperparameters, we would use the following command:
 
 ```
 uv run train
+```
+
+This use use a default set of configs, and we could also choose specifc settings (for instance, `ex1_conf.yaml`) by running:
+
+```
+uv run train --config-name ex1_conf
 ```
 
 Following training, the used configurations and the logs were automatically saved in the `outputs/` folder for future reference.
@@ -363,7 +375,20 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 14 fill here ---
+We have picked three screenshots below from our W&B dashboard. Firstly the [loss chart below](figures/loss_chart.png):
+
+![loss chart image](https://github.com/DitteGilsfeldt/MLOps_Group_50/tree/main/MLOps_project/reports/figures/loss_chart.png)
+
+This image shows the loss over a training process through 10 epochs for different runs, all with same set of configs as depicted at the top of the image. Next is the [image of hyperparameter sweeps](figures/sweep.png):
+
+![sweep image](https://github.com/DitteGilsfeldt/MLOps_Group_50/tree/main/MLOps_project/reports/figures/sweep.png)
+
+The image shows optimal choices of parameter values for learning rate, batch size and epochs for which will give the lowest validation loss (as depicted by the color bar). Finally, we have an image over [validation](figures/val_chart.png) below:
+
+![val image](https://github.com/DitteGilsfeldt/MLOps_Group_50/tree/main/MLOps_project/reports/figures/val_chart.png)
+
+These were for the same model runs for the loss chart, but this time, we see validation accuracy again over 10 epochs for all models (and the other configs are the same as well).
+
 
 ### Question 15
 
@@ -378,7 +403,7 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 15 fill here ---
+[TO DO: en docker expert please go on :)]
 
 ### Question 16
 
@@ -393,7 +418,7 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 16 fill here ---
+[TO DO: someone else GO :)]
 
 ## Working in the cloud
 
@@ -410,7 +435,7 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 17 fill here ---
+[TO DO: henrik du har den (eller en anden idk)]
 
 ### Question 18
 
@@ -425,7 +450,7 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 18 fill here ---
+[TO DO: henrik igen]
 
 ### Question 19
 
@@ -434,7 +459,7 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 19 fill here ---
+[TO DO: somebody get the images]
 
 ### Question 20
 
@@ -443,7 +468,7 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 20 fill here ---
+[TO DO: somebody get the images]
 
 ### Question 21
 
@@ -452,7 +477,7 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 21 fill here ---
+[TO DO: somebody get the images]
 
 ### Question 22
 
@@ -467,7 +492,7 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 22 fill here ---
+[TO DO: someoe else go]
 
 ## Deployment
 
@@ -484,7 +509,7 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 23 fill here ---
+Yes, we wrote a simple API "app" for our model using FastAPI, which has located in `api/main.py`. The app exposes an endpoint `/predict` that accepts POST requests with input data for making predictions. We used the `uvicorn` server to run the FastAPI application locally for testing purposes first. What the app does is that it loads a pre-trained version of our emotion model, then a user can upload an image with a facial expression, and the app will return the predicted emotion along with a score on how confident the model is. Of course, the emotions that the model can predict are limited to the labels that is it trained on.
 
 ### Question 24
 
@@ -500,7 +525,9 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 24 fill here ---
+We did it both locally and on the cloud. Firstly, for local deployment, we used `uvicorn` to run the FastAPI application on our local machine as described above. This allowed us to test the API and ensure it was functioning correctly before deploying it to the cloud.
+
+[TO DO: add more about cloud deployment]
 
 ### Question 25
 
@@ -515,7 +542,7 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 25 fill here ---
+[TO DO: actually make api unit testing? and then describe it]
 
 ### Question 26
 
@@ -530,7 +557,7 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 26 fill here ---
+[TO DO: idk]
 
 ## Overall discussion of project
 
@@ -549,7 +576,7 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 27 fill here ---
+[TO DO: henrik :)]
 
 ### Question 28
 
@@ -565,7 +592,7 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 28 fill here ---
+[TO DO: :0]
 
 ### Question 29
 
@@ -582,7 +609,11 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 29 fill here ---
+![diagram](https://github.com/DitteGilsfeldt/MLOps_Group_50/tree/main/MLOps_project/reports/figures/MLOps_diagram.png)
+
+The starting point of the diagram is the setup on our local machine which all happens inside our own git repository. Here, we have integrated both .dvc for pulling data from gcp cloud storage (instead of having thousands of images locally on each member's computer), we have UV for package managing, and then we have the overall cookie cutter project structure. Inside this, we implemented all necessary code for data loading, model definition, training and evaluation and testing - everything needed to run and test our machine learning model. Then, whenever we are ready, we commit the changes to a local branch, which sends a pull request to the main git. Here, everything undergoes unit testing and linting before being merged into the main branch.
+
+When a merge into the main branch happens, it triggers a cloud build in the gcp with our docker container. Then with a built container, we can run models on the cloud and start monitoring. Monitoring is triggered in gcloud but is sent to W&B for visualization and logging of the model run.
 
 ### Question 30
 
@@ -596,7 +627,7 @@ As mentioned in the question above, we used Hydra for configuration management. 
 >
 > Answer:
 
---- question 30 fill here ---
+[TO DO: write a good answer here.]
 
 ### Question 31
 
@@ -613,3 +644,5 @@ As mentioned in the question above, we used Hydra for configuration management. 
 > *All members contributed to code by...*
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
+
+[TO DO: write contributions here]
