@@ -85,4 +85,12 @@ started with Machine Learning Operations (MLOps).
 
 [Exam template for 02476 Machine Learning Operations](https://github.com/DitteGilsfeldt/MLOps_Group_50/tree/main/MLOps_project/reports)
 
+## Project diagram
+
+Below is a brief overview of the overall MLOps project structure and workflow:
+
+![diagram](https://github.com/DitteGilsfeldt/MLOps_Group_50/tree/main/MLOps_project/reports/figures/MLOps_diagram.png)
+
+This diagram is also found under the exam checklist as an answer to question 29.
+
 ---

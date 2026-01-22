@@ -10,6 +10,9 @@ The directory structure of the project looks like this:
 │   ├── dependabot.yaml
 │   └── workflows/
 │       └── tests.yaml
+├── api/                      # API related code
+│   ├── data_drift.py
+│   └── main.py               # API code
 ├── configs/                  # Configuration files
 ├── data/                     # Data directory
 │   ├── processed
