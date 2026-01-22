@@ -13,7 +13,9 @@ The directory structure of the project looks like this:
 ├── api/                      # API related code
 │   ├── data_drift.py
 │   └── main.py               # API code
-├── configs/                  # Configuration files
+├── config/                   # Configuration files
+│   ├── experiments/          # Experiment configurations
+│   └── testings/             # Pytest configurations
 ├── data/                     # Data directory
 │   ├── processed
 │   └── raw
