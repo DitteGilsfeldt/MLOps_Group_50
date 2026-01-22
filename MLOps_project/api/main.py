@@ -7,6 +7,7 @@ import torch
 from fastapi import BackgroundTasks, FastAPI, File, HTTPException, UploadFile
 from group50.model import EmotionModel
 from PIL import Image, ImageStat
+from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
 from torchvision import transforms
 
@@ -78,7 +79,8 @@ async def add_to_database(timestamp: str, predicted_emotion: str, confidence: fl
         (timestamp, predicted_emotion, confidence, properties["brightness"], properties["contrast"]),
     )
     print(
-        f"Added prediction to database: {timestamp}, {predicted_emotion}, {confidence}, {properties['brightness']}, {properties['contrast']}"
+        f"Added prediction to database: {timestamp}, {predicted_emotion} "
+        f"{confidence}, {properties['brightness']}, {properties['contrast']}"
     )
 
     conn.commit()
@@ -103,6 +105,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Emotion Recognition API", lifespan=lifespan)
+Instrumentator().instrument(app).expose(app)
 
 
 @app.post("/predict", response_model=PredictionResponse)
