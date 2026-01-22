@@ -39,6 +39,7 @@ dependencies = [
     "wandb>=0.24.0",
     "uvicorn[standard]",
     "fastapi==0.115.6",
+    "prometheus-client>=0.24.1",
 ]
 
 [dependency-groups]
