@@ -310,7 +310,18 @@ Yes, we used `DVC` (Data Version Control) to manage our large image datasets. In
 >
 > Answer:
 
-[TO DO: mattias du kan cooke her I believe]
+ In our project, we have organized our continuous integration into 7 workflows (found under .github/workflows), each serving a specific purpose in our development pipeline. Four of our workflows run automatically on every push to the main branch:
+- Linting checks code quality against PEP8 standards using Ruff.
+- Tests runs our unit test suite with pytest.
+- Deploy-docs publishes our documentation,
+- Docker-builder automatically builds and pushes Docker images to our GCP Artifact Registry.
+
+For our pytests (tests.yaml) we test across multiple Python versions (3.10, 3.11, 3.12) and operating systems (Ubuntu, Windows, macOS) to ensure broad compatibility and catch version-specific issues early if needed. The multi-Python testing helps us maintain code that works reliably across different environments the team might use. We did however experience rather slow run times, and to optimize the CI/CD execution time we implemented caching for both the linting and testing workflows, which significantly reduced redundant installations and re-computations, allowing faster feedback on our code changes.
+
+Additionally, we implemented 3 event-triggered workflows that activate under specific conditions:
+- Pre-commit-update runs nightly (or manually) to update pre-commit hook versions and open a pull request
+- Stage-model triggers when model registry changes occur (ensuring version control of trained models).
+- CML-data activates when data changes are detected, enabling continuous monitoring of data pipeline integrity.
 
 ## Running code and tracking experiments
 
@@ -532,6 +543,8 @@ Yes, we wrote a simple API "app" for our model using FastAPI, which has located 
 
 We successfully deployed our `FastAPI` application to `Cloud Run` for a serverless production environment. To ensure the service was reachable for testing, we enabled unauthenticated invocations by granting the Cloud Run Invoker role to allUsers. The API is publicly accessible at: `https://simple-emotion-gcp-app-826382891728.europe-west1.run.app`. To manage costs, we configured the service with strict scaling limits, including a maximum of 1 concurrent request per instance.
 
+HEADS UP: the link that you see is a setup built on an older docker image that calls the `src/group50/api.py` as the main entry point for the application, hence the link should just show some "status": "ok" message when accessed via a web browser. So again, to emphasize that our main FastAPI app is located in `api/main.py` which this link from an outdated docker image does not point to.
+
 ### Question 25
 
 > **Did you perform any unit testing and load testing of your API? If yes, explain how you did it and what results for**
@@ -545,7 +558,15 @@ We successfully deployed our `FastAPI` application to `Cloud Run` for a serverle
 >
 > Answer:
 
-[TO DO: actually make api unit testing? and then describe it]
+For unit testing we used pytest and implemented tests covering the most critical parts of our API and ML pipeline: data loading, model behavior, and training.
+
+For the data layer, we tested that the processed tensors load correctly, that train and test sets are non-empty, that each sample has shape (3, 48, 48), and that all labels lie in the expected range 0–6. These tests are skipped automatically if the data files are not present.
+
+For the model, we verified that the forward pass returns outputs of shape (batch, 7), that the model contains trainable parameters, and that it raises meaningful errors when given invalid input shapes. We also used parametrized tests to validate behavior for different batch sizes.
+
+For training, we ran a short two-epoch training loop and checked that the loss values are finite and that a model checkpoint is saved.
+
+For load testing, we would use Locust to simulate concurrent users sending requests to the API endpoints. By gradually increasing the number of users, we could measure response times, throughput, and error rates to identify the service’s performance limits and potential bottlenecks.
 
 ### Question 26
 
@@ -601,7 +622,7 @@ In general, working in the cloud was a highly positive but steep learning curve.
 >
 > Answer:
 
-[TO DO: :0]
+We have not implemented anything extra in our project.
 
 ### Question 29
 
@@ -655,7 +676,7 @@ When a merge into the main branch happens, it triggers a cloud build in the gcp 
 > Answer:
 
 All five members contributed actively through coding, reviews, debugging sessions, and report/documentation work.
-Student s10666 emphasized testing/QA and CI reliability (unit tests, coverage, linting, pre-commit, API tests, load tests) and supported performance improvements.
+Student s20666 emphasized testing/QA and CI reliability (unit tests, coverage, linting, pre-commit, API tests, load tests) and supported performance improvements.
 
 Student s224215 emphasized project structure and configuration (cookiecutter, data pipeline, dependency management, Hydra configs) and supported API/deployment and architecture documentation.
 
