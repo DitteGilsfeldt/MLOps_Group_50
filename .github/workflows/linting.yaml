@@ -27,6 +27,7 @@ jobs:
         with:
           path: |
             ~/.cache/uv
+            ~/Library/Caches/uv
             %LocalAppData%\uv\cache
           key: ${{ runner.os }}-py${{ matrix.python-version }}-uv-${{ hashFiles('MLOps_project/uv.lock') }}
             
