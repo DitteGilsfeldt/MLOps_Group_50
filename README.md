@@ -41,7 +41,9 @@ The following directory structure corresponds to the contents of the `MLOps_proj
 ├── api/                      # API related code
 │   ├── data_drift.py
 │   └── main.py               # API code
-├── configs/                  # Configuration files
+├── config/                   # Configuration files
+│   ├── experiments/          # Experiment configurations
+│   └── testings/             # Pytest configurations
 ├── data/                     # Data directory
 │   ├── processed
 │   └── raw
