@@ -24,7 +24,7 @@ REQUIRED_FILES = [
 # TEST EVAL SKAL KUNNE EVALERE RESULTET FRA DEN HER PY FIL
 
 def test_training_pipeline():
-    loss_stats = train(lr=0.001, batch_size=32, epochs=2, model_name="emotion_test", wb=False, workers = 0)
+    loss_stats = train(lr=0.001, batch_size=32, epochs=2, model_name="emotion_test", wb=False, workers=0)
 
     model_path = PROJECT_ROOT / "models" / "emotion_test.pth"
 

@@ -17,7 +17,14 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.mp
 log = logging.getLogger(__name__)
 
 
-def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name: str = "emotion_model", wb: bool = True, workers: int = 2):
+def train(
+    lr: float = 0.001,
+    batch_size: int = 32,
+    epochs: int = 10,
+    model_name: str = "emotion_model",
+    wb: bool = True,
+    workers: int = 2,
+):
     """Train a model on emtion_data.
     Args:
         config: Hydra configuration object containing hyperparameters.
