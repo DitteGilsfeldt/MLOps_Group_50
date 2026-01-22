@@ -657,7 +657,17 @@ When a merge into the main branch happens, it triggers a cloud build in the gcp 
 >
 > Answer:
 
-[TO DO: write a good answer here.]
+The most significant challenge of this project was the transition from local development to a fully integrated GCP environment. While our initial Python scripts and model logic worked perfectly on local machines, "cloudifying" the workflow introduced a layer of complexity regarding infrastructure orchestration, IAM permissions, and persistent storage paths that we had not fully anticipated.
+
+We spent a good amount of our time troubleshooting environment parity and pathing issues within `Vertex AI`. A major bottleneck occurred when our training script, which ran successfully in a local Docker container, failed in the cloud because it could not correctly reference the `GCS FUSE mount points`. We encountered multiple RuntimeError and OSError instances where the script attempted to write checkpoints to local container directories that did not persist, rather than the intended Cloud Storage buckets.
+
+To overcome these obstacles, we adopted a more disciplined MLOps approach:
+
+Infrastructure as Code & Robust Pathing: We refactored our train.py and main.py to dynamically detect the environment. By using `os.makedirs(..., exist_ok=True)` and conditional pathing logic, we ensured the code could switch between local `/models` and cloud `/gcs/` directories without manual intervention.
+
+Permission & Security Layer: We spent significant time resolving `IAM permission` errors. We initially struggled with "Input/output" errors that were ultimately traced back to the service account having only "Viewer" roles. Upgrading to Storage Object Admin was a critical "aha!" moment that allowed our Vertex AI jobs to finally save artifacts.
+
+Containerization for Portability: Using Docker was essential to overcoming "it works on my machine" syndrome. By building unified images for both training and inference, we ensured that the dependencies used in Vertex AI exactly matched our local testing environment.
 
 ### Question 31
 
