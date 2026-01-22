@@ -17,7 +17,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.mp
 log = logging.getLogger(__name__)
 
 
-def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name: str = "emotion_model", wb=True):
+def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name: str = "emotion_model", wb: bool = True, workers: int = 2):
     """Train a model on emtion_data.
     Args:
         config: Hydra configuration object containing hyperparameters.
@@ -39,8 +39,8 @@ def train(lr: float = 0.001, batch_size: int = 32, epochs: int = 10, model_name:
     model = EmotionModel().to(DEVICE)
     train_set, test_set = emotion_data()
 
-    train_dataloader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=2)
-    test_dataloader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=2)
+    train_dataloader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=workers)
+    test_dataloader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=workers)
 
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
