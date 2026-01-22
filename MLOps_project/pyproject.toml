@@ -43,6 +43,7 @@ dependencies = [
     "locust>=2.43.1",
     "prometheus-client>=0.24.1",
     "prometheus-fastapi-instrumentator>=7.1.0",
+    "loguru>=0.7.3",
 ]
 
 [dependency-groups]
