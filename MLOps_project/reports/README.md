@@ -560,7 +560,7 @@ We successfully deployed our `FastAPI` application to `Cloud Run` for a serverle
 >
 > Answer:
 
-[TO DO: idk]
+Yes, we (almost) successfully implemented monitoring for our deployed model by instrumenting our FastAPI application with the Prometheus FastAPI Instrumentator. This setup automatically exposes a `/metrics` endpoint that tracks essential "Golden Signals," including request counts, latencies, and HTTP status codes (e.g., 2xx, 4xx, 5xx). To visualize this telemetry in the cloud, we enabled the Google Cloud Managed Service for Prometheus sidecar for our Cloud Run service, allowing custom metrics to flow directly into a Google Cloud Monitoring dashboard
 
 ## Overall discussion of project
 
