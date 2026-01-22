@@ -32,10 +32,7 @@ jobs:
       - name: Cache uv
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.cache/uv
-            ~/Library/Caches/uv
-            %LocalAppData%\uv\cache
+          path: ${{ env.UV_CACHE_DIR }}
           key: ${{ runner.os }}-py${{ matrix.python-version }}-uv-${{ hashFiles('MLOps_project/uv.lock') }}
 
       - name: Install dependencies
