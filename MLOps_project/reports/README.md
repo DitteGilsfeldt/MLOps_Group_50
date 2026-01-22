@@ -293,9 +293,7 @@ The first thing we did when joining a shared Git repository was to create a bran
 >
 > Answer:
 
---- question 10 fill here ---
-
-> Yes, we used `DVC` (Data Version Control) to manage our large image datasets. Instead of storing the `.pt` files in Git, which would make the repository too large, DVC created small `.dvc` metadata files. These files contain hashes (pointers) to the actual data stored in our `GCP Bucket`. This allowed us to version our data alongside our code, ensuring that every model version is linked to the exact dataset version used to train it.
+Yes, we used `DVC` (Data Version Control) to manage our large image datasets. Instead of storing the `.pt` files in Git, which would make the repository too large, DVC created small `.dvc` metadata files. These files contain hashes (pointers) to the actual data stored in our `GCP Bucket`. This allowed us to version our data alongside our code, ensuring that every model version is linked to the exact dataset version used to train it.
 
 ### Question 11
 
@@ -331,7 +329,7 @@ The first thing we did when joining a shared Git repository was to create a bran
 >
 > Answer:
 
-> We used Hydra for configuration management. We mainly focused on configs for the trianing setup, as we saw ourselves testing training procuderes the most. Therefore, `.yaml` files for `training.py` were created in the `configs/` folder. Inside this file, we could choose the parameters for training such as learning rate, batch size, and number of epochs. With different `.yaml` files, we could have numerous training setups, some for large model runs, others for smaller runs. To run an experiment with specific hyperparameters, we would use the following command:
+We used Hydra for configuration management. We mainly focused on configs for the trianing setup, as we saw ourselves testing training procuderes the most. Therefore, `.yaml` files for `training.py` were created in the `configs/` folder. Inside this file, we could choose the parameters for training such as learning rate, batch size, and number of epochs. With different `.yaml` files, we could have numerous training setups, some for large model runs, others for smaller runs. To run an experiment with specific hyperparameters, we would use the following command:
 
 ```
 uv run train
@@ -358,7 +356,7 @@ Following training, the used configurations and the logs were automatically save
 >
 > Answer:
 
-> As mentioned in the question above, we used Hydra for configuration management. Whenever an experiment is run, the configuration file used for that specific experiment is saved in the `outputs/` folder along with the logs and results. This ensures that all the hyperparameters and settings used during the experiment are recorded and can be referenced later.
+As mentioned in the question above, we used Hydra for configuration management. Whenever an experiment is run, the configuration file used for that specific experiment is saved in the `outputs/` folder along with the logs and results. This ensures that all the hyperparameters and settings used during the experiment are recorded and can be referenced later.
 
 ### Question 14
 
@@ -379,9 +377,9 @@ We have picked three screenshots below from our W&B dashboard. Firstly the [loss
 
 ![loss chart image](figures/loss_chart.png)
 
-This image shows the loss over a training process through 10 epochs for different runs, all with same set of configs as depicted at the top of the image. Next is the [image of hyperparameter sweeps](figures/sweep.png):
+This image shows the loss over a training process through 10 epochs for different runs, all with same set of configs as depicted at the top of the image. Next is the [image of hyperparameter sweeps](figures/sweeps.png):
 
-![sweep image](figures/sweep.png)
+![sweep image](figures/sweeps.png)
 
 The image shows optimal choices of parameter values for learning rate, batch size and epochs for which will give the lowest validation loss (as depicted by the color bar). Finally, we have an image over [validation](figures/val_chart.png) below:
 
@@ -403,7 +401,7 @@ These were for the same model runs for the loss chart, but this time, we see val
 >
 > Answer:
 
-> Docker was central to our project's reproducibility. We created a Dockerfile that defined our environment, including the Python version and all dependencies from our `pyproject.toml`. We used this to build a unified image for both training and inference. To run the inference image locally for testing, we used: `docker run -p 8000:8000 europe-west1-docker.pkg.dev/lofty-root-484207-a0/group50-docker-repo/emotion-app:latest`.
+Docker was central to our project's reproducibility. We created a Dockerfile that defined our environment, including the Python version and all dependencies from our `pyproject.toml`. We used this to build a unified image for both training and inference. To run the inference image locally for testing, we used: `docker run -p 8000:8000 europe-west1-docker.pkg.dev/lofty-root-484207-a0/group50-docker-repo/emotion-app:latest`.
 
 ### Question 16
 
@@ -432,12 +430,12 @@ These were for the same model runs for the loss chart, but this time, we see val
 >
 > Answer: We used the following four primary GCP services:
 
-> `Cloud Storage:` Acted as our data lake and model registry, storing our versioned datasets (.pt tensors) and trained model checkpoints (.pth files).
-> `Artifact Registry:` A central repository where we stored and managed our Docker container images for both training and inference.
+`Cloud Storage:` Acted as our data lake and model registry, storing our versioned datasets (.pt tensors) and trained model checkpoints (.pth files).
+`Artifact Registry:` A central repository where we stored and managed our Docker container images for both training and inference.
 
-> `Vertex AI:` Used for serverless custom training jobs. It provisioned the necessary compute resources to run our training script at scale without us managing the underlying VMs.
+`Vertex AI:` Used for serverless custom training jobs. It provisioned the necessary compute resources to run our training script at scale without us managing the underlying VMs.
 
-> `Cloud Run:` A fully managed platform where we deployed our FastAPI inference service as a container, allowing it to auto-scale based on incoming request traffic.
+`Cloud Run:` A fully managed platform where we deployed our FastAPI inference service as a container, allowing it to auto-scale based on incoming request traffic.
 
 ### Question 18
 
@@ -452,7 +450,7 @@ These were for the same model runs for the loss chart, but this time, we see val
 >
 > Answer:
 
-> While we used `Vertex AI` for training, it utilizes Compute Engine infrastructure under the hood. For our training jobs, we used n1-standard-4 machine types. These VMs provide a balanced mix of 4 vCPUs and 15 GB of memory, which was sufficient for our ResNet18 emotion classification model. We opted for these because they are optimized for general-purpose workloads and are cost-effective for the scale of our dataset.
+While we used `Vertex AI` for training, it utilizes Compute Engine infrastructure under the hood. For our training jobs, we used n1-standard-4 machine types. These VMs provide a balanced mix of 4 vCPUs and 15 GB of memory, which was sufficient for our ResNet18 emotion classification model. We opted for these because they are optimized for general-purpose workloads and are cost-effective for the scale of our dataset.
 
 
 ### Question 19
@@ -461,7 +459,7 @@ These were for the same model runs for the loss chart, but this time, we see val
 > **You can take inspiration from [this figure](figures/bucket.png).**
 >
 > Answer:
->
+
 ![bucket image](figures/GCP_bucket_group50.png)
 
 ### Question 20
@@ -498,8 +496,8 @@ These were for the same model runs for the loss chart, but this time, we see val
 > *was because ...*
 >
 > Answer:
->
-> Yes, we successfully trained our model using Vertex AI Custom Jobs. We containerized our training application with Docker and pushed it to the Artifact Registry. We then used the `gcloud ai custom-jobs create` command to launch the job in the `europe-west1` region. Vertex AI automatically provisioned an `n1-standard-4` VM, mounted our GCS bucket via GCS FUSE so the script could read the training data, and executed the training. After completion, the model was saved back to our GCS bucket. 
+
+Yes, we successfully trained our model using Vertex AI Custom Jobs. We containerized our training application with Docker and pushed it to the Artifact Registry. We then used the `gcloud ai custom-jobs create` command to launch the job in the `europe-west1` region. Vertex AI automatically provisioned an `n1-standard-4` VM, mounted our GCS bucket via GCS FUSE so the script could read the training data, and executed the training. After completion, the model was saved back to our GCS bucket.
 
 ## Deployment
 
@@ -532,7 +530,7 @@ Yes, we wrote a simple API "app" for our model using FastAPI, which has located 
 >
 > Answer:
 
-> We successfully deployed our `FastAPI` application to `Cloud Run` for a serverless production environment. To ensure the service was reachable for testing, we enabled unauthenticated invocations by granting the Cloud Run Invoker role to allUsers. The API is publicly accessible at: `https://simple-emotion-gcp-app-826382891728.europe-west1.run.app`. To manage costs, we configured the service with strict scaling limits, including a maximum of 1 concurrent request per instance.
+We successfully deployed our `FastAPI` application to `Cloud Run` for a serverless production environment. To ensure the service was reachable for testing, we enabled unauthenticated invocations by granting the Cloud Run Invoker role to allUsers. The API is publicly accessible at: `https://simple-emotion-gcp-app-826382891728.europe-west1.run.app`. To manage costs, we configured the service with strict scaling limits, including a maximum of 1 concurrent request per instance.
 
 ### Question 25
 
@@ -581,11 +579,11 @@ Yes, we wrote a simple API "app" for our model using FastAPI, which has located 
 >
 > Answer:
 
-> Group member Henrik: During the project, I was the primary user of the group's cloud resources. We started with a $50.00 credit allocation, and by the end of the project, $48.85 remained, meaning we spent a total of $1.15.
+Group member Henrik: During the project, I was the primary user of the group's cloud resources. We started with a $50.00 credit allocation, and by the end of the project, $48.85 remained, meaning we spent a total of $1.15.
 
-> The most expensive service was `Vertex AI` (Compute Engine). This was due to the multiple training iterations (v1 through v13) we performed on `n1-standard-4` virtual machines to resolve pathing and checkpointing issues. While Cloud Storage hosted our large processed tensors and model registry, its cost was negligible compared to the active compute time required for model training.
+The most expensive service was `Vertex AI` (Compute Engine). This was due to the multiple training iterations (v1 through v13) we performed on `n1-standard-4` virtual machines to resolve pathing and checkpointing issues. While Cloud Storage hosted our large processed tensors and model registry, its cost was negligible compared to the active compute time required for model training.
 
-> In general, working in the cloud was a highly positive but steep learning curve. The ability to provision high-performance hardware on demand and share data instantly with group members via `GCS buckets` was invaluable for our collaboration. However, the complexity of `IAM` permissions and the initial difficulty of debugging "hidden" containerized environments reminded us that cloud development requires much more meticulous environment configuration than local development.
+In general, working in the cloud was a highly positive but steep learning curve. The ability to provision high-performance hardware on demand and share data instantly with group members via `GCS buckets` was invaluable for our collaboration. However, the complexity of `IAM` permissions and the initial difficulty of debugging "hidden" containerized environments reminded us that cloud development requires much more meticulous environment configuration than local development.
 
 ![Credits](figures/credits.png)
 
@@ -656,4 +654,15 @@ When a merge into the main branch happens, it triggers a cloud build in the gcp 
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
-[TO DO: write contributions here]
+All five members contributed actively through coding, reviews, debugging sessions, and report/documentation work.
+Student s10666 emphasized testing/QA and CI reliability (unit tests, coverage, linting, pre-commit, API tests, load tests) and supported performance improvements.
+
+Student s224215 emphasized project structure and configuration (cookiecutter, data pipeline, dependency management, Hydra configs) and supported API/deployment and architecture documentation.
+
+Student s210659 emphasized cloud execution and operations (GCP storage, cloud training, Cloud Run deployment, metrics/monitoring/alerts).
+
+Student s225787 emphasized reproducibility and model robustness (Docker, CI image builds, W&B tracking/sweeps, drift detection and deployment).
+
+Student s224081 emphasized model/training implementation and developer tooling (model/training code, CLI, CI improvements, tests, pre-commit support).
+
+Generative AI tools: We used ChatGPT for troubleshooting and improving test/CI setup and code structure; GitHub Copilot for boilerplate and small code fragments.
