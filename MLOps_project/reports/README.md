@@ -291,7 +291,9 @@ The first thing we did when joining a shared Git repository was to create a bran
 >
 > Answer:
 
-Yes, we used `DVC` (Data Version Control) to manage our large image datasets. Instead of storing the `.pt` files in Git, which would make the repository too large, DVC created small `.dvc` metadata files. These files contain hashes (pointers) to the actual data stored in our `GCP Bucket`. This allowed us to version our data alongside our code, ensuring that every model version is linked to the exact dataset version used to train it.
+Yes, we used `DVC` (Data Version Control) to manage our large image datasets. Instead of storing the `.pth` files in Git, which would make the repository too large, DVC created small `.dvc` metadata files. This was very useful, as we cut could done several MB's of data from our Git repository. Having such large files being shoved around in push and pull requests between out local devices would also slow down our development process, as many of our machines would have trouble downloading such large files. Before `DVC` we also tried an open source git extension called Git LFS, but this did not work well for macos users, and we all preferred `DVC` instead.
+
+These files contain hashes (pointers) to the actual data stored in our `GCP Bucket`. This allowed us to version our data alongside our code, ensuring that every model version is linked to the exact dataset version used to train it.
 
 ### Question 11
 
@@ -338,19 +340,19 @@ Additionally, we implemented 3 event-triggered workflows that activate under spe
 >
 > Answer:
 
-We used Hydra for configuration management. We mainly focused on configs for the trianing setup, as we saw ourselves testing training procuderes the most. Therefore, `.yaml` files for `training.py` were created in the `configs/` folder. Inside this file, we could choose the parameters for training such as learning rate, batch size, and number of epochs. With different `.yaml` files, we could have numerous training setups, some for large model runs, others for smaller runs. To run an experiment with specific hyperparameters, we would use the following command:
+We used Hydra for configuration management, focusing mainly on training experiments. YAML files for `training.py` were defined in a `configs/` folder, where parameters such as learning rate, batch size, and epochs were specified. This allowed us to easily switch between different training setups. A default experiment was run using:
 
 ```
 uv run train
 ```
 
-This use use a default set of configs, and we could also choose specifc settings (for instance, `ex1_conf.yaml`) by running:
+Specific configurations, e.g. `ex1_conf.yaml`, were selected via:
 
 ```
 uv run train --config-name ex1_conf
 ```
 
-Following training, the used configurations and the logs were automatically saved in the `outputs/` folder for future reference.
+All configurations and logs were automatically saved in the `outputs/` folder.
 
 ### Question 13
 
@@ -390,16 +392,19 @@ We have picked three screenshots below from our W&B dashboard. Firstly the [loss
 
 ![loss chart image](figures/loss_chart.png)
 
-This image shows the loss over a training process through 10 epochs for different runs, all with same set of configs as depicted at the top of the image. Next is the [image of hyperparameter sweeps](figures/sweeps.png):
+This image shows the loss over a training process through 10 epochs for different runs. We have a total of 4 runs that are logged right now each with its own color (of course we have had more, but we cleaned up in our w&b project). Here, all runs are with same set of configs as depicted at the top of the image. On the image, the y-axis is our training loss value, and the x-axis is batches, and each point in the graph is a batch update where each step processes 32 samples.
+
+Next up is the [image of hyperparameter sweeps](figures/sweeps.png):
 
 ![sweep image](figures/sweeps.png)
 
-The image shows optimal choices of parameter values for learning rate, batch size and epochs for which will give the lowest validation loss (as depicted by the color bar). Finally, we have an image over [validation](figures/val_chart.png) below:
+The image shows optimal choices of parameter values for learning rate, batch size and epochs for which will give the lowest validation loss (as depicted by the color bar). This is an interesting and useful image as it could help us identify key hyperparameters that could help improve model performance. For instance, one of the runs shows that 10 epochs and a small batch sice and learning rate on 1 gives a low validation loss (yellow color).
+
+Finally, we have an image over [validation](figures/val_chart.png) below:
 
 ![val image](figures/val_chart.png)
 
-These were for the same model runs for the loss chart, but this time, we see validation accuracy again over 10 epochs for all models (and the other configs are the same as well).
-
+These were for the same model runs for the loss chart, but this time, we see validation accuracy again over 10 epochs for all models (and the other configs are the same as well). For this image, the x-axis is batch updates again, and y-axis is validation accuracy.
 
 ### Question 15
 
@@ -477,8 +482,9 @@ We didn’t do any code profiling in this project, even though it probably would
 >
 > Answer:
 
-While we used `Vertex AI` for training, it utilizes Compute Engine infrastructure under the hood. For our training jobs, we used n1-standard-4 machine types. These VMs provide a balanced mix of 4 vCPUs and 15 GB of memory, which was sufficient for our ResNet18 emotion classification model. We opted for these because they are optimized for general-purpose workloads and are cost-effective for the scale of our dataset.
+While we utilized `Vertex AI` for our serverless training runs, the platform leverages Compute Engine infrastructure as its underlying "backbone" to execute custom code. For our specific training jobs, we selected the `n1-standard-4` machine type from the general-purpose family. These virtual machines provide a balanced configuration of 4 vCPUs and 15 GB of RAM, which proved sufficient for processing our ResNet18 emotion classification model without hitting memory bottlenecks.
 
+We opted for this specific tier because it is optimized for balanced performance and cost-efficiency for small-to-moderate datasets. By using these instances, we benefited from high-performance networking and the ability to mount our GCS buckets directly to the VM via GCS FUSE, allowing for seamless data streaming during the training process. This setup ensured we only paid for the active compute time required for our v1 through v13 training iterations, keeping our total spend well within our project credits.
 
 ### Question 19
 
@@ -524,7 +530,9 @@ While we used `Vertex AI` for training, it utilizes Compute Engine infrastructur
 >
 > Answer:
 
-Yes, we successfully trained our model using Vertex AI Custom Jobs. We containerized our training application with Docker and pushed it to the Artifact Registry. We then used the `gcloud ai custom-jobs create` command to launch the job in the `europe-west1` region. Vertex AI automatically provisioned an `n1-standard-4` VM, mounted our GCS bucket via GCS FUSE so the script could read the training data, and executed the training. After completion, the model was saved back to our GCS bucket.
+Yes, we successfully trained our model using `Vertex AI` Custom Jobs. We containerized our training application with Docker and pushed it to the Artifact Registry, ensuring our environment was identical to our local setup. We then used the gcloud ai custom-jobs create command to launch the job in the europe-west1 region.
+
+Vertex AI automatically provisioned an `n1-standard-4` VM (4 vCPUs, 15 GB RAM), which provided the necessary compute power for our ResNet18 model. A critical component was mounting our `GCS bucket via GCS FUSE`, which allowed the script to stream the training tensors (`.pt` files) directly as if they were on a local drive, bypassing the need for manual downloads. This serverless approach was highly efficient as the resources were only active during the training duration, minimizing costs. After the final epoch, the model checkpoint was automatically saved back to our persistent GCS bucket for future deployment.
 
 ## Deployment
 
@@ -597,7 +605,10 @@ For load testing, we would use Locust to simulate concurrent users sending reque
 >
 > Answer:
 
-Yes, we (almost) successfully implemented monitoring for our deployed model by instrumenting our FastAPI application with the Prometheus FastAPI Instrumentator. This setup automatically exposes a `/metrics` endpoint that tracks essential "Golden Signals," including request counts, latencies, and HTTP status codes (e.g., 2xx, 4xx, 5xx). To visualize this telemetry in the cloud, we enabled the Google Cloud Managed Service for Prometheus sidecar for our Cloud Run service, allowing custom metrics to flow directly into a Google Cloud Monitoring dashboard
+Yes, we (almost) successfully implemented monitoring for our deployed model by instrumenting our FastAPI application with the Prometheus FastAPI Instrumentator. This setup automatically exposes a `/metrics` endpoint that tracks essential "Golden Signals," including request counts, latencies, and HTTP status codes (e.g., 2xx, 4xx, 5xx). 
+
+To visualize this telemetry in the cloud, we enabled the Google Cloud Managed Service for Prometheus sidecar for our Cloud Run service, allowing custom metrics to flow directly into a Google Cloud Monitoring dashboard. We also succesfully linked our GCP training to W&B (Wandb), allowing us to m
+onitor model performance metrics like inference latency, prediction confidence, and error rates over time. This allowed us to track if the model's behavior degraded in production or if data drift occurred.
 
 ## Overall discussion of project
 
@@ -657,9 +668,16 @@ We have not implemented anything extra in our project.
 
 ![diagram](figures/MLOps_diagram.png)
 
-The starting point of the diagram is the setup on our local machine which all happens inside our own git repository. Here, we have integrated both .dvc for pulling data from gcp cloud storage (instead of having thousands of images locally on each member's computer), we have UV for package managing, and then we have the overall cookie cutter project structure. Inside this, we implemented all necessary code for data loading, model definition, training and evaluation and testing - everything needed to run and test our machine learning model. Then, whenever we are ready, we commit the changes to a local branch, which sends a pull request to the main git. Here, everything undergoes unit testing and linting before being merged into the main branch.
+The starting point of the diagram is the setup on our local machine, which all happens inside our own Git repository. Here, we have integrated .dvc for pulling data from GCP Cloud Storage, which allows us to avoid storing large datasets locally on each team member’s machine. Instead, the data is versioned and fetched when needed. We use uv for package and environment management, ensuring reproducibility across machines, together with a cookiecutter project structure that enforces a consistent and scalable layout.
 
-When a merge into the main branch happens, it triggers a cloud build in the gcp with our docker container. Then with a built container, we can run models on the cloud and start monitoring. Monitoring is triggered in gcloud but is sent to W&B for visualization and logging of the model run.
+Within this local setup, we implemented all necessary code for data loading, model definition, training, evaluation, and testing. This includes preprocessing pipelines, PyTorch-based model development, and experiment tracking with W&B. All development is performed in isolated virtual environments to avoid dependency conflicts and ensure consistent behavior.
+When changes are ready, they are committed to a local branch and submitted as a pull request to the main GitHub repository. At this stage, GitHub Actions automatically triggers unit tests, formatting checks (via Ruff), and general code validation. This step ensures that only stable and well-tested code is merged into the main branch, maintaining overall system reliability.
+
+Once code is merged into the main branch, it triggers a Cloud Build job in GCP that builds our Docker container. This container encapsulates the full runtime environment, including dependencies and model code, making deployments reproducible and portable. The latest container is then used to deploy and run models in the cloud.
+
+After deployment, monitoring is triggered in GCP and the metrics are sent to Weights & Biases for visualization and logging. This enables us to track training behavior, performance metrics, and compare experiments across runs in a centralized dashboard. W&B therefore plays a key role in experiment management and post-deployment analysis.
+
+Overall, this architecture connects local development, versioned data, automated testing, cloud deployment, and experiment tracking into one coherent MLOps pipeline, ensuring reproducibility, scalability, and transparency throughout the entire machine learning lifecycle.
 
 ### Question 30
 
