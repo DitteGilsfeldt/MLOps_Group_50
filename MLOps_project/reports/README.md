@@ -583,9 +583,9 @@ Yes, we wrote a simple API "app" for our model using FastAPI, which has located 
 
 > Group member Henrik: During the project, I was the primary user of the group's cloud resources. We started with a $50.00 credit allocation, and by the end of the project, $48.85 remained, meaning we spent a total of $1.15.
 
-The most expensive service was `Vertex AI` (Compute Engine). This was due to the multiple training iterations (v1 through v13) we performed on `n1-standard-4` virtual machines to resolve pathing and checkpointing issues. While Cloud Storage hosted our large processed tensors and model registry, its cost was negligible compared to the active compute time required for model training.
+> The most expensive service was `Vertex AI` (Compute Engine). This was due to the multiple training iterations (v1 through v13) we performed on `n1-standard-4` virtual machines to resolve pathing and checkpointing issues. While Cloud Storage hosted our large processed tensors and model registry, its cost was negligible compared to the active compute time required for model training.
 
-In general, working in the cloud was a highly positive but steep learning curve. The ability to provision high-performance hardware on demand and share data instantly with group members via `GCS buckets` was invaluable for our collaboration. However, the complexity of `IAM` permissions and the initial difficulty of debugging "hidden" containerized environments reminded us that cloud development requires much more meticulous environment configuration than local development.
+> In general, working in the cloud was a highly positive but steep learning curve. The ability to provision high-performance hardware on demand and share data instantly with group members via `GCS buckets` was invaluable for our collaboration. However, the complexity of `IAM` permissions and the initial difficulty of debugging "hidden" containerized environments reminded us that cloud development requires much more meticulous environment configuration than local development.
 
 ![Credits](figures/credits.png)
 
