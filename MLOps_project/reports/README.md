@@ -90,19 +90,19 @@ will check the repositories and the code to verify your answers.
 * [X] Get your model training in GCP using either the Engine or Vertex AI (M21)
 * [X] Create a FastAPI application that can do inference using your model (M22)
 * [X] Deploy your model in GCP using either Functions or Run as the backend (M23)
-* [ WORKING] Write API tests for your application and setup continues integration for these (M24)
-* [ WORKING] Load test your application (M24)
+* [X] Write API tests for your application and setup continues integration for these (M24)
+* [X] Load test your application (M24)
 * [ ] Create a more specialized ML-deployment API using either ONNX or BentoML, or both (M25)
 * [ ] Create a frontend for your API (M26)
 
 ### Week 3
 
-* [ WORKING ] Check how robust your model is towards data drifting (M27)
-* [ WORKING ] Deploy to the cloud a drift detection API (M27)
-* [TO DO ] Instrument your API with a couple of system metrics (M28)
-* [X (Working Henrik)] Setup cloud monitoring of your instrumented application (M28)
-* [X (Working Henrik)] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
-* [ TO DO (core)] If applicable, optimize the performance of your data loading using distributed data loading (M29)
+* [X] Check how robust your model is towards data drifting (M27)
+* [X] Deploy to the cloud a drift detection API (M27)
+* [ ] Instrument your API with a couple of system metrics (M28)
+* [ ] Setup cloud monitoring of your instrumented application (M28)
+* [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
+* [X] If applicable, optimize the performance of your data loading using distributed data loading (M29)
 * [ ] If applicable, optimize the performance of your training pipeline by using distributed training (M30)
 * [ ] Play around with quantization, compilation and pruning for you trained models to increase inference speed (M31)
 
@@ -377,15 +377,15 @@ As mentioned in the question above, we used Hydra for configuration management. 
 
 We have picked three screenshots below from our W&B dashboard. Firstly the [loss chart below](figures/loss_chart.png):
 
-![loss chart image](https://github.com/DitteGilsfeldt/MLOps_Group_50/tree/main/MLOps_project/reports/figures/loss_chart.png)
+![loss chart image](figures/loss_chart.png)
 
 This image shows the loss over a training process through 10 epochs for different runs, all with same set of configs as depicted at the top of the image. Next is the [image of hyperparameter sweeps](figures/sweep.png):
 
-![sweep image](https://github.com/DitteGilsfeldt/MLOps_Group_50/tree/main/MLOps_project/reports/figures/sweep.png)
+![sweep image](figures/sweep.png)
 
 The image shows optimal choices of parameter values for learning rate, batch size and epochs for which will give the lowest validation loss (as depicted by the color bar). Finally, we have an image over [validation](figures/val_chart.png) below:
 
-![val image](https://github.com/DitteGilsfeldt/MLOps_Group_50/tree/main/MLOps_project/reports/figures/val_chart.png)
+![val image](figures/val_chart.png)
 
 These were for the same model runs for the loss chart, but this time, we see validation accuracy again over 10 epochs for all models (and the other configs are the same as well).
 
@@ -609,7 +609,7 @@ We did it both locally and on the cloud. Firstly, for local deployment, we used 
 >
 > Answer:
 
-![diagram](https://github.com/DitteGilsfeldt/MLOps_Group_50/tree/main/MLOps_project/reports/figures/MLOps_diagram.png)
+![diagram](figures/MLOps_diagram.png)
 
 The starting point of the diagram is the setup on our local machine which all happens inside our own git repository. Here, we have integrated both .dvc for pulling data from gcp cloud storage (instead of having thousands of images locally on each member's computer), we have UV for package managing, and then we have the overall cookie cutter project structure. Inside this, we implemented all necessary code for data loading, model definition, training and evaluation and testing - everything needed to run and test our machine learning model. Then, whenever we are ready, we commit the changes to a local branch, which sends a pull request to the main git. Here, everything undergoes unit testing and linting before being merged into the main branch.
 

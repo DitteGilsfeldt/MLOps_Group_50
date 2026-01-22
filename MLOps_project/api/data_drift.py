@@ -1,12 +1,11 @@
-import pandas as pd
 import sqlite3
 from pathlib import Path
-from PIL import Image, ImageStat
-import numpy as np
-import torch
-from evidently.legacy.report import Report
-from evidently.legacy.metric_preset import DataDriftPreset
 
+import numpy as np
+import pandas as pd
+from evidently.legacy.metric_preset import DataDriftPreset
+from evidently.legacy.report import Report
+from PIL import Image, ImageStat
 
 DATABASE_PATH = "../data/data_drifting/database.db"
 DATA_ROOT = Path("../data/raw/lfw-deepfunneled")
@@ -15,16 +14,14 @@ REFERENCE_DATA_PATH = Path("../data/data_drifting/reference_data.csv")
 
 def calculate_image_properties(image: Image.Image) -> dict:
     """Calculate basic properties of the image.
-        Args:
-          image: PIL Image object"""
+    Args:
+      image: PIL Image object"""
     stat = ImageStat.Stat(image)
     brightness = np.mean(stat.mean)
     contrast = np.mean(stat.stddev)
 
-    return {
-        "brightness": brightness,
-        "contrast": contrast
-    }
+    return {"brightness": brightness, "contrast": contrast}
+
 
 def create_reference_dataframe() -> pd.DataFrame:
     """Creates the reference dataset from train split with variables needed for data drift detection."""
@@ -69,4 +66,3 @@ print(reference_df.head())
 report = Report(metrics=[DataDriftPreset()])
 report.run(reference_data=reference_df, current_data=pred_df)
 report.save_html("report.html")
-
