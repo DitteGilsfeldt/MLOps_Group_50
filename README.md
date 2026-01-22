@@ -38,6 +38,9 @@ The following directory structure corresponds to the contents of the `MLOps_proj
 │   ├── dependabot.yaml
 │   └── workflows/
 │       └── tests.yaml
+├── api/                      # API related code
+│   ├── data_drift.py
+│   └── main.py               # API code
 ├── configs/                  # Configuration files
 ├── data/                     # Data directory
 │   ├── processed
@@ -89,7 +92,7 @@ started with Machine Learning Operations (MLOps).
 
 Below is a brief overview of the overall MLOps project structure and workflow:
 
-![diagram](https://github.com/DitteGilsfeldt/MLOps_Group_50/tree/main/MLOps_project/reports/figures/MLOps_diagram.png)
+![diagram](MLOps_project/reports/figures/MLOps_diagram.png)
 
 This diagram is also found under the exam checklist as an answer to question 29.
 
