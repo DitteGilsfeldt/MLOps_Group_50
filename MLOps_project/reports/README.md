@@ -412,7 +412,7 @@ These were for the same model runs for the loss chart, but this time, we see val
 >
 > Answer:
 
-Docker was central to our project's reproducibility. We created a Dockerfile that defined our environment, including the Python version and all dependencies from our `pyproject.toml`. We used this to build a unified image for both training and inference. To run the inference image locally for testing, we used: `docker run -p 8000:8000 europe-west1-docker.pkg.dev/lofty-root-484207-a0/group50-docker-repo/emotion-app:latest`.
+
 
 ### Question 16
 
