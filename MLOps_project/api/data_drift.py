@@ -1,24 +1,23 @@
 import sqlite3
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
+import torch
 from evidently.legacy.metric_preset import DataDriftPreset
 from evidently.legacy.report import Report
-from PIL import Image, ImageStat
 
 DATABASE_PATH = "../data/data_drifting/database.db"
-DATA_ROOT = Path("../data/raw/lfw-deepfunneled")
+DATA_ROOT = Path("../data/processed/train")
 REFERENCE_DATA_PATH = Path("../data/data_drifting/reference_data.csv")
 
 
-def calculate_image_properties(image: Image.Image) -> dict:
+def calculate_image_properties(image: torch.Tensor) -> dict:
     """Calculate basic properties of the image.
     Args:
-      image: PIL Image object"""
-    stat = ImageStat.Stat(image)
-    brightness = np.mean(stat.mean)
-    contrast = np.mean(stat.stddev)
+      image: torch Tensor representing the image"""
+
+    brightness = image.mean().item()
+    contrast = image.std().item()
 
     return {"brightness": brightness, "contrast": contrast}
 
@@ -27,17 +26,15 @@ def create_reference_dataframe() -> pd.DataFrame:
     """Creates the reference dataset from train split with variables needed for data drift detection."""
 
     rows = []
-
-    for person_path in DATA_ROOT.iterdir():
-        for img_path in sorted(person_path.glob("*.jpg")):
-            img = Image.open(img_path)
-            properties = calculate_image_properties(img)
-            rows.append(
-                {
-                    "brightness": properties["brightness"],
-                    "contrast": properties["contrast"],
-                }
-            )
+    train_images = torch.load(DATA_ROOT / "train_images.pt")
+    for i, image_tensor in enumerate(train_images):
+        properties = calculate_image_properties(image_tensor)
+        rows.append(
+            {
+                "brightness": properties["brightness"],
+                "contrast": properties["contrast"],
+            }
+        )
     return pd.DataFrame(rows)
 
 
