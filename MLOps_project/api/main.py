@@ -2,11 +2,10 @@ import sqlite3
 from contextlib import asynccontextmanager
 from datetime import datetime
 
-import numpy as np
 import torch
 from fastapi import BackgroundTasks, FastAPI, File, HTTPException, UploadFile
 from group50.model import EmotionModel
-from PIL import Image, ImageStat
+from PIL import Image
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
 from torchvision import transforms
@@ -51,13 +50,13 @@ def init_database():
     conn.close()
 
 
-def calculate_image_properties(image: Image.Image) -> dict:
+def calculate_image_properties(image: torch.Tensor) -> dict:
     """Calculate basic properties of the image.
     Args:
-      image: PIL Image object"""
-    stat = ImageStat.Stat(image)
-    brightness = np.mean(stat.mean)
-    contrast = np.mean(stat.stddev)
+      image: torch Tensor representing the image"""
+
+    brightness = image.mean().item()
+    contrast = image.std().item()
 
     return {"brightness": brightness, "contrast": contrast}
 
